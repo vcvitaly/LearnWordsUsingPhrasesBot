@@ -18,6 +18,6 @@ workflows:
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
-          family: "learn_words-service"
-          cluster: "learn-words-cluster"
-          container-image-name-updates: "container=learn_words-service,tag=${CIRCLE_SHA1}"
+          family: " learn_words_using_phrases_bot-service"
+          cluster: "learn-words-using-phrases-bot-cluster"
+          container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX}-service,tag=${CIRCLE_SHA1}"
