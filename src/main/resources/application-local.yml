@@ -1,4 +1,4 @@
 telegram:
   bot:
-    username: sjdkfhaljkshfhsaldfhds_bot
+    username: test_learn_words_bot
     token: ${TELEGRAM_BOT_TOKEN}
