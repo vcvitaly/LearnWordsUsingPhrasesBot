@@ -18,6 +18,7 @@ workflows:
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
           tag: "${CIRCLE_BRANCH}_${CIRCLE_SHA1},${CIRCLE_BRANCH}_latest"
           dockerfile: docker/Dockerfile
+          skip-when-tags-exist: true
           filters:
             branches:
               only:
