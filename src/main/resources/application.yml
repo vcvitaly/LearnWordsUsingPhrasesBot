@@ -6,6 +6,3 @@ logging:
   level:
     com.github.vcvitaly.learnwordsusingphrases: DEBUG
 
-lombok:
-  log:
-    fieldName: LOG
