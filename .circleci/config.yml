@@ -12,6 +12,8 @@ workflows:
   build-and-deploy:
     jobs:
       - aws-ecr/build-and-push-image:
+          setup-remote-docker: true
+          remote-docker-layer-caching: true
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
           tag: "${CIRCLE_BRANCH}_${CIRCLE_SHA1},${CIRCLE_BRANCH}_latest"
           dockerfile: docker/Dockerfile
