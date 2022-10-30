@@ -15,6 +15,10 @@ workflows:
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
           tag: "${CIRCLE_BRANCH}_${CIRCLE_SHA1},${CIRCLE_BRANCH}_latest"
           dockerfile: docker/Dockerfile
+          filters:
+            branches:
+              only:
+                - main
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
