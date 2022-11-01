@@ -15,6 +15,8 @@ import java.util.List;
 @FeignClient(name = "free-dictionary-api-client", url = "${route.freedictionaryapi}")
 public interface FreeDictionaryApiClient {
 
-    @GetMapping("/api/v2/entries/en/{word}")
+    String ENDPOINT = "/api/v2/entries/en/";
+
+    @GetMapping(ENDPOINT + "{word}")
     List<WordDefinitionResponseItem> getWordDefinitionResponse(@PathVariable(name = "word") String word);
 }
