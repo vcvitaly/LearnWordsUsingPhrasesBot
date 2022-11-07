@@ -8,8 +8,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import static com.github.vcvitaly.learnwordsusingphrases.util.Constants.NEW_LINE;
-
 /**
  * TelegramBotService.
  *
@@ -24,10 +22,14 @@ public class TelegramBotService extends TelegramLongPollingBot {
     @Value("${telegram.bot.token}")
     private String token;
 
-    private GoogleDefinitionApiService googleDefinitionApiService;
+    private DefinitionFacadeService definitionFacadeService;
 
-    public TelegramBotService(GoogleDefinitionApiService googleDefinitionApiService) {
-        this.googleDefinitionApiService = googleDefinitionApiService;
+    private TelegramMessageChecker messageChecker;
+
+    public TelegramBotService(DefinitionFacadeService definitionFacadeService,
+                              TelegramMessageChecker messageChecker) {
+        this.definitionFacadeService = definitionFacadeService;
+        this.messageChecker = messageChecker;
     }
 
     @Override
@@ -53,20 +55,22 @@ public class TelegramBotService extends TelegramLongPollingBot {
             }
             if (message.hasText()) {
                 String word = message.getText();
-                sendText(message.getChatId(), "You sent this word: " + word + NEW_LINE +
-                        googleDefinitionApiService.getDefinitionsAsString(word));
+                sendText(message.getChatId(),
+                        messageChecker.replaceIllegalChars(definitionFacadeService.getDefinitionsAsString(word)));
             }
         }
     }
 
-    private void sendText(Long chatId, String text){
+    private void sendText(Long chatId, String text) {
         SendMessage sm = SendMessage.builder()
-                .chatId(chatId.toString()) //Who are we sending a message to
-                .text(text).build();    //Message content
+                .chatId(chatId.toString())
+                .text(text)
+                .build();
+        sm.enableMarkdownV2(true);
         try {
-            execute(sm);                        //Actually sending the message
+            execute(sm);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);      //Any error will be printed here
+            throw new RuntimeException(e);
         }
     }
 }

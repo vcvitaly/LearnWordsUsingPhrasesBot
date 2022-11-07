@@ -1,4 +1,4 @@
-package com.github.vcvitaly.learnwordsusingphrases.service.impl;
+package com.github.vcvitaly.learnwordsusingphrases.service;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import org.junit.jupiter.api.AfterEach;
@@ -14,19 +14,19 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.telegram.telegrambots.starter.TelegramBotInitializer;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.vcvitaly.learnwordsusingphrases.client.FreeDictionaryApiClient.ENDPOINT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * FreeDictionaryApiServiceTest.
+ * DefinitionFacadeServiceIntegrationTest.
  *
  * @author Vitalii Chura
  */
 @ActiveProfiles({"test"})
 @SpringBootTest
-class FreeDictionaryApiServiceTest {
+class DefinitionFacadeServiceIntegrationTest {
 
     private static final String WORD = "hello";
     private static final String NON_EXISTING_WORD = "aaaaa";
@@ -35,7 +35,7 @@ class FreeDictionaryApiServiceTest {
     private TelegramBotInitializer telegramBotInitializer;
 
     @Autowired
-    private FreeDictionaryApiService freeDictionaryApiService;
+    private DefinitionFacadeService definitionFacadeService;
 
     @RegisterExtension
     static WireMockExtension wireMockServer = WireMockExtension.newInstance()
@@ -64,20 +64,21 @@ class FreeDictionaryApiServiceTest {
                         )
         );
         var expectedString = """
-                interjection
+                Please find definitions for the word *hello*
+                *interjection*
                 Definition: A greeting (salutation) said when meeting someone or acknowledging someone’s arrival or presence.
-                Example: Hello, everyone.
+                Example: *Hello*, everyone.
                 Definition: A greeting used when answering the telephone.
-                Example: Hello? How may I help you?
+                Example: *Hello*? How may I help you?
                 Definition: A call for response if it is not clear if anyone is present or listening, or if a telephone conversation may have been disconnected.
-                Example: Hello? Is anyone there?
+                Example: *Hello*? Is anyone there?
                 Definition: Used sarcastically to imply that the person addressed or referred to has done something the speaker or writer considers to be foolish.
-                Example: You just tried to start your car with your cell phone. Hello?
+                Example: You just tried to start your car with your cell phone. *Hello*?
                 Definition: An expression of puzzlement or discovery.
-                Example: Hello! What’s going on here?
-                """;
+                Example: *Hello*! What’s going on here?
+                 """;
 
-        assertThat(freeDictionaryApiService.getDefinitionsAsString(WORD))
+        assertThat(definitionFacadeService.getDefinitionsAsString(WORD))
                 .isEqualTo(expectedString);
     }
 
@@ -95,7 +96,7 @@ class FreeDictionaryApiServiceTest {
 
         var expectedString = String.format("Definition not found for: %s", NON_EXISTING_WORD);
 
-        assertThat(freeDictionaryApiService.getDefinitionsAsString(NON_EXISTING_WORD))
+        assertThat(definitionFacadeService.getDefinitionsAsString(NON_EXISTING_WORD))
                 .isEqualTo(expectedString);
     }
 }
