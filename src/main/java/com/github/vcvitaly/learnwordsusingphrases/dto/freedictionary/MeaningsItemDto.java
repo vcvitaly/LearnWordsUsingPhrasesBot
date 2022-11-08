@@ -4,9 +4,9 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class FreeDictionaryDefinitionItemDto {
+public class MeaningsItemDto {
     private List<String> synonyms;
+    private String partOfSpeech;
     private List<String> antonyms;
-    private String definition;
-    private String example;
+    private List<DefinitionItemDto> definitions;
 }

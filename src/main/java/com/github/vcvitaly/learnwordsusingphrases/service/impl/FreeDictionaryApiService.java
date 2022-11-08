@@ -3,11 +3,12 @@ package com.github.vcvitaly.learnwordsusingphrases.service.impl;
 import com.github.vcvitaly.learnwordsusingphrases.client.FreeDictionaryApiClient;
 import com.github.vcvitaly.learnwordsusingphrases.dto.DefinitionDto;
 import com.github.vcvitaly.learnwordsusingphrases.dto.DefinitionItemDto;
-import com.github.vcvitaly.learnwordsusingphrases.dto.freedictionary.FreeDictionaryMeaningsItemDto;
-import com.github.vcvitaly.learnwordsusingphrases.dto.freedictionary.FreeDictionaryWordDefinitionResponseItemDto;
+import com.github.vcvitaly.learnwordsusingphrases.dto.freedictionary.MeaningsItemDto;
+import com.github.vcvitaly.learnwordsusingphrases.dto.freedictionary.WordDefinitionResponseItemDto;
 import com.github.vcvitaly.learnwordsusingphrases.exception.DefinitionNotFoundException;
 import com.github.vcvitaly.learnwordsusingphrases.service.DefinitionApiService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import static java.util.Collections.emptyList;
  */
 @Slf4j
 @Service
+@Order(1)
 public class FreeDictionaryApiService implements DefinitionApiService {
 
     private FreeDictionaryApiClient client;
@@ -33,7 +35,7 @@ public class FreeDictionaryApiService implements DefinitionApiService {
     @Override
     public List<DefinitionDto> getDefinitions(String word) {
         log.info("Getting a definition for: " + word);
-        List<FreeDictionaryWordDefinitionResponseItemDto> wordDefinitionResponses;
+        List<WordDefinitionResponseItemDto> wordDefinitionResponses;
         try {
             wordDefinitionResponses = client.getWordDefinitionResponse(word);
         } catch (Exception e) {
@@ -51,7 +53,7 @@ public class FreeDictionaryApiService implements DefinitionApiService {
                 .toList();
     }
 
-    private DefinitionDto toDefinitionDto(FreeDictionaryMeaningsItemDto meaningsItemDto) {
+    private DefinitionDto toDefinitionDto(MeaningsItemDto meaningsItemDto) {
         var definitionDto = new DefinitionDto();
         definitionDto.setPartOfSpeech(meaningsItemDto.getPartOfSpeech());
         definitionDto.setDefinitionItems(
