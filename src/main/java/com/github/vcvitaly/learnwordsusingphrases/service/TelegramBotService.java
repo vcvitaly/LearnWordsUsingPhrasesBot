@@ -52,11 +52,12 @@ public class TelegramBotService extends TelegramLongPollingBot {
                     sendText(message.getChatId(), "Please type a word and I'll send you it's definition and " +
                             "an example of it's usage.");
                 }
+                return;
             }
             if (message.hasText()) {
                 String word = message.getText();
                 sendText(message.getChatId(),
-                        messageChecker.replaceIllegalChars(definitionFacadeService.getDefinitionsAsString(word)));
+                        definitionFacadeService.getDefinitionsAsString(word));
             }
         }
     }
@@ -64,7 +65,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private void sendText(Long chatId, String text) {
         SendMessage sm = SendMessage.builder()
                 .chatId(chatId.toString())
-                .text(text)
+                .text(messageChecker.replaceIllegalChars(text))
                 .build();
         sm.enableMarkdownV2(true);
         try {
