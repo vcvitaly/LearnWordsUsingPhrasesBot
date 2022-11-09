@@ -3,7 +3,7 @@
 version: 2.1
 
 orbs:
-  aws-ecr: circleci/aws-ecr@8.1.3
+  aws-ecr: circleci/aws-ecr@7.0.0
   aws-ecs: circleci/aws-ecs@3.2.0
 
 #executors:
@@ -18,7 +18,7 @@ workflows:
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
           tag: "${CIRCLE_BRANCH}_${CIRCLE_SHA1},${CIRCLE_BRANCH}_latest"
           dockerfile: docker/Dockerfile
-#          skip-when-tags-exist: true
+          skip-when-tags-exist: true
           filters:
             branches:
               only:
