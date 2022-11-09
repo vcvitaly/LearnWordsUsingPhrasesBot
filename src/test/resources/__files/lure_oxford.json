@@ -1,0 +1,119 @@
+{
+  "id": "lure",
+  "metadata": {
+    "operation": "retrieve",
+    "provider": "Oxford University Press",
+    "schema": "RetrieveEntry"
+  },
+  "results": [
+    {
+      "id": "lure",
+      "language": "en-gb",
+      "lexicalEntries": [
+        {
+          "entries": [
+            {
+              "homographNumber": "100",
+              "senses": [
+                {
+                  "definitions": [
+                    "tempt (a person or animal) to do something or to go somewhere, especially by offering some form of reward"
+                  ],
+                  "examples": [
+                    {
+                      "text": "the child was lured into a car but managed to escape"
+                    }
+                  ],
+                  "id": "m_en_gbus0601470.005"
+                }
+              ]
+            }
+          ],
+          "language": "en-gb",
+          "lexicalCategory": {
+            "id": "verb",
+            "text": "Verb"
+          },
+          "text": "lure"
+        },
+        {
+          "entries": [
+            {
+              "homographNumber": "101",
+              "senses": [
+                {
+                  "definitions": [
+                    "something that tempts or is used to tempt a person or animal to do something"
+                  ],
+                  "examples": [
+                    {
+                      "text": "the film industry always has been a glamorous lure for young girls"
+                    }
+                  ],
+                  "id": "m_en_gbus0601470.017",
+                  "subsenses": [
+                    {
+                      "definitions": [
+                        "the strongly attractive quality of a person or thing"
+                      ],
+                      "examples": [
+                        {
+                          "text": "the lure of the exotic East"
+                        }
+                      ],
+                      "id": "m_en_gbus0601470.021"
+                    }
+                  ]
+                },
+                {
+                  "definitions": [
+                    "a type of bait used in fishing or hunting."
+                  ],
+                  "id": "m_en_gbus0601470.023",
+                  "subsenses": [
+                    {
+                      "definitions": [
+                        "a bunch of feathers with a piece of meat attached to a long string, swung around the head of the falconer to recall a hawk."
+                      ],
+                      "id": "m_en_gbus0601470.024"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "language": "en-gb",
+          "lexicalCategory": {
+            "id": "noun",
+            "text": "Noun"
+          },
+          "text": "lure"
+        }
+      ],
+      "type": "headword",
+      "word": "lure"
+    },
+    {
+      "id": "lure",
+      "language": "en-gb",
+      "lexicalEntries": [
+        {
+          "entries": [
+            {
+              "homographNumber": "200"
+            }
+          ],
+          "language": "en-gb",
+          "lexicalCategory": {
+            "id": "noun",
+            "text": "Noun"
+          },
+          "text": "lure"
+        }
+      ],
+      "type": "headword",
+      "word": "lure"
+    }
+  ],
+  "word": "lure"
+}

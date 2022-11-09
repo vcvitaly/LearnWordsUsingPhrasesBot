@@ -2,6 +2,7 @@ package com.github.vcvitaly.learnwordsusingphrases.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * DefinitionItemDto.
@@ -10,6 +11,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class DefinitionItemDto {
     private String definition;
     private String example;

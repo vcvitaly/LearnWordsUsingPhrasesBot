@@ -2,6 +2,3 @@ telegram:
   bot:
     username: test_learn_words_bot
     token: ${TELEGRAM_BOT_TOKEN}
-
-route:
-  freedictionaryapi: "https://api.dictionaryapi.dev"

@@ -1,6 +1,8 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.github.vcvitaly.learnwordsusingphrases.client.FreeDictionaryApiClient;
+import com.github.vcvitaly.learnwordsusingphrases.client.OxfordApiClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -16,7 +18,6 @@ import org.telegram.telegrambots.starter.TelegramBotInitializer;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.vcvitaly.learnwordsusingphrases.client.FreeDictionaryApiClient.ENDPOINT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -28,7 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class DefinitionFacadeServiceIntegrationTest {
 
-    private static final String WORD = "hello";
+    private static final String WORD_HELLO = "hello";
+    private static final String WORD_LURE = "lure";
     private static final String NON_EXISTING_WORD = "aaaaa";
 
     @MockBean
@@ -45,6 +47,7 @@ class DefinitionFacadeServiceIntegrationTest {
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("route.freedictionaryapi", wireMockServer::baseUrl);
+        registry.add("route.oxfordapi", wireMockServer::baseUrl);
     }
 
     @AfterEach
@@ -53,18 +56,19 @@ class DefinitionFacadeServiceIntegrationTest {
     }
 
     @Test
-    void wordDefinitionsWithExamplesAreReturned() {
+    void wordDefinitionsAreReturnedFromFreeDictionaryApi() {
         wireMockServer.stubFor(
-                get(ENDPOINT + WORD)
+                get(FreeDictionaryApiClient.ENDPOINT + WORD_HELLO)
                         .willReturn(
                                 aResponse()
                                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                                        .withBodyFile("hello.json")
+                                        .withBodyFile("hello_freedictionary.json")
                                         .withStatus(200)
                         )
         );
+
         var expectedString = """
-                Please find definitions for the word *hello*
+                Please find definitions for the word *hello*:
                 *interjection*
                 Definition: A greeting (salutation) said when meeting someone or acknowledging someone’s arrival or presence.
                 Example: *Hello*, everyone.
@@ -77,15 +81,14 @@ class DefinitionFacadeServiceIntegrationTest {
                 Definition: An expression of puzzlement or discovery.
                 Example: *Hello*! What’s going on here?
                  """;
-
-        assertThat(definitionFacadeService.getDefinitionsAsString(WORD))
-                .isEqualTo(expectedString);
+        var definitionsAsString = definitionFacadeService.getDefinitionsAsString(WORD_HELLO);
+        assertThat(definitionsAsString).isEqualTo(expectedString);
     }
 
     @Test
     void definitionNotFoundIsReturnedOnIncorrectWord() {
         wireMockServer.stubFor(
-                get(ENDPOINT + NON_EXISTING_WORD)
+                get(FreeDictionaryApiClient.ENDPOINT + NON_EXISTING_WORD)
                         .willReturn(
                                 aResponse()
                                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
@@ -94,9 +97,62 @@ class DefinitionFacadeServiceIntegrationTest {
                         )
         );
 
-        var expectedString = String.format("Definition not found for: %s", NON_EXISTING_WORD);
+        var expectedString = String.format("Definitions not found for: %s", NON_EXISTING_WORD);
 
         assertThat(definitionFacadeService.getDefinitionsAsString(NON_EXISTING_WORD))
                 .isEqualTo(expectedString);
+    }
+
+    @Test
+    void wordDefinitionsAreReturnedFromOxfordApi() {
+        wireMockServer.stubFor(
+                get(OxfordApiClient.ENDPOINT + "/entries/en-gb/" + WORD_HELLO + "?fields=definitions%2Cexamples&strictMatch=false")
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                                        .withBodyFile("hello_oxford.json")
+                                        .withStatus(200)
+                        )
+        );
+
+        var expectedString = """
+                Please find definitions for the word *hello*:
+                *interjection*
+                Definition: used as a greeting or to begin a phone conversation
+                Example: *hello* there, Katie!
+                *noun*
+                Definition: an utterance of ‘hello’; a greeting
+                Example: she was getting polite nods and *hello*s from people
+                *verb*
+                Definition: say or shout ‘hello’
+                Example: I pressed the phone button and *hello*ed
+                 """;
+        var definitionsAsString = definitionFacadeService.getDefinitionsAsString(WORD_HELLO);
+        assertThat(definitionsAsString).isEqualTo(expectedString);
+    }
+
+    @Test
+    void wordDefinitionsAreReturnedFromOxfordApiForAWordWithMissingExamples() {
+        wireMockServer.stubFor(
+                get(OxfordApiClient.ENDPOINT + "/entries/en-gb/" + WORD_LURE + "?fields=definitions%2Cexamples&strictMatch=false")
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                                        .withBodyFile("lure_oxford.json")
+                                        .withStatus(200)
+                        )
+        );
+
+        var expectedString = """
+                Please find definitions for the word *lure*:
+                *verb*
+                Definition: tempt (a person or animal) to do something or to go somewhere, especially by offering some form of reward
+                Example: the child was *lure*d into a car but managed to escape
+                *noun*
+                Definition: something that tempts or is used to tempt a person or animal to do something
+                Example: the film industry always has been a glamorous *lure* for young girls
+                 """;
+        var definitionsAsString = definitionFacadeService.getDefinitionsAsString(WORD_LURE);
+        assertThat(definitionsAsString).isEqualTo(expectedString);
     }
 }

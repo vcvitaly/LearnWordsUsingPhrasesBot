@@ -34,7 +34,6 @@ public class FreeDictionaryApiService implements DefinitionApiService {
 
     @Override
     public List<DefinitionDto> getDefinitions(String word) {
-        log.info("Getting a definition for: " + word);
         List<WordDefinitionResponseItemDto> wordDefinitionResponses;
         try {
             wordDefinitionResponses = client.getWordDefinitionResponse(word);
@@ -45,6 +44,7 @@ public class FreeDictionaryApiService implements DefinitionApiService {
             throw e;
         }
 
+        log.debug("Received a response for word '{}' from FreeDictionary API: {}", word, wordDefinitionResponses);
         return wordDefinitionResponses.get(0).getMeanings().stream()
                 .filter(item -> item.getDefinitions().stream()
                         .anyMatch(definitionItem -> Objects.nonNull(definitionItem.getExample()))
@@ -56,15 +56,18 @@ public class FreeDictionaryApiService implements DefinitionApiService {
     private DefinitionDto toDefinitionDto(MeaningsItemDto meaningsItemDto) {
         var definitionDto = new DefinitionDto();
         definitionDto.setPartOfSpeech(meaningsItemDto.getPartOfSpeech());
-        definitionDto.setDefinitionItems(
-                meaningsItemDto.getDefinitions().stream()
-                        .map(
-                                freeDictionaryDefinitionItemDto -> new DefinitionItemDto(
-                                        freeDictionaryDefinitionItemDto.getDefinition(),
-                                        freeDictionaryDefinitionItemDto.getExample()
-                                )
-                        ).toList()
-        );
+        var definitionItems = meaningsItemDto.getDefinitions().stream()
+                .map(this::toDefinitionItemDto)
+                .toList();
+        definitionDto.setDefinitionItems(definitionItems);
         return definitionDto;
+    }
+
+    private DefinitionItemDto toDefinitionItemDto(
+            com.github.vcvitaly.learnwordsusingphrases.dto.freedictionary.DefinitionItemDto freeDictionaryDefinitionItemDto) {
+        return new DefinitionItemDto(
+                freeDictionaryDefinitionItemDto.getDefinition(),
+                freeDictionaryDefinitionItemDto.getExample()
+        );
     }
 }

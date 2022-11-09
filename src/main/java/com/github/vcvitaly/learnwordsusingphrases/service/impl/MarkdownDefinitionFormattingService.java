@@ -23,7 +23,11 @@ public class MarkdownDefinitionFormattingService implements DefinitionFormatting
     @Override
     public String getDefinitionsAsString(List<DefinitionDto> definitions, String word) {
         var definitionSb = new StringBuilder();
-        definitionSb.append("Please find definitions for the word ").append(getBold(word)).append(NEW_LINE);
+        definitionSb
+                .append("Please find definitions for the word ")
+                .append(getBold(word))
+                .append(":")
+                .append(NEW_LINE);
         definitions.stream()
                 .map(definition -> getDefinition(definition, word))
                 .forEach(definitionSb::append);

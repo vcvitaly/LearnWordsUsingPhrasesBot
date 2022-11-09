@@ -1,3 +1,15 @@
+api:
+  oxford:
+    app-id: "app-id"
+    app-key: "app-key"
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 500
+        readTimeout: 500
+
 telegram:
   bot:
     username: username
