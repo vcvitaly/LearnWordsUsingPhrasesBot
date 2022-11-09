@@ -30,4 +30,6 @@ workflows:
           cluster: "learn-words-using-phrases-bot-cluster"
           container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX},tag=${CIRCLE_BRANCH}_latest"
           container-env-var-updates: "container=${AWS_RESOURCE_NAME_PREFIX},name=APPLICATION_PROFILE,value=${APPLICATION_PROFILE},
-                                      container=${AWS_RESOURCE_NAME_PREFIX},name=TELEGRAM_BOT_TOKEN,value=${TELEGRAM_BOT_TOKEN}"
+                                      container=${AWS_RESOURCE_NAME_PREFIX},name=TELEGRAM_BOT_TOKEN,value=${TELEGRAM_BOT_TOKEN},
+                                      container=${AWS_RESOURCE_NAME_PREFIX},name=OXFORD_API_APP_ID,value=${OXFORD_API_APP_ID},
+                                      container=${AWS_RESOURCE_NAME_PREFIX},name=OXFORD_API_APP_KEY,value=${OXFORD_API_APP_KEY}"

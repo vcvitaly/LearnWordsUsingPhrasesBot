@@ -1,0 +1,29 @@
+[
+  {
+    "partOfSpeech": "interjection",
+    "definitionItems": [
+      {
+        "definition": "used as a greeting or to begin a phone conversation",
+        "example": "hello there, Katie!"
+      }
+    ]
+  },
+  {
+    "partOfSpeech": "noun",
+    "definitionItems": [
+      {
+        "definition": "an utterance of ‘hello’; a greeting",
+        "example": "she was getting polite nods and hellos from people"
+      }
+    ]
+  },
+  {
+    "partOfSpeech": "verb",
+    "definitionItems": [
+      {
+        "definition": "say or shout ‘hello’",
+        "example": "I pressed the phone button and helloed"
+      }
+    ]
+  }
+]
