@@ -56,8 +56,13 @@ public class TelegramBotService extends TelegramLongPollingBot {
             }
             if (message.hasText()) {
                 String word = message.getText();
-                sendText(message.getChatId(),
-                        definitionFacadeService.getDefinitionsAsString(word));
+                String text;
+                try {
+                    text = definitionFacadeService.getDefinitionsAsString(word);
+                } catch (Exception e) {
+                    text = "Oops, something went wrong.";
+                }
+                sendText(message.getChatId(), text);
             }
         }
     }

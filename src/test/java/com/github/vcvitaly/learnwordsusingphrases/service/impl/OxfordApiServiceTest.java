@@ -17,6 +17,7 @@ import java.util.List;
 
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.OxfordApiSourceLang.EN_GB;
 import static com.github.vcvitaly.learnwordsusingphrases.service.impl.OxfordApiService.FIELDS;
+import static com.github.vcvitaly.learnwordsusingphrases.util.DefinitionPreparationHelper.prepareExpectedDefinitions;
 import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readResourceAsString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -48,11 +49,28 @@ class OxfordApiServiceTest {
     void wordDefinitionsWithExamplesAreReturned() throws JsonProcessingException {
         when(oxfordApiClient.getWordDefinitionResponse(
                 null, null, EN_GB.getSourceLang(), WORD, FIELDS, false)
-        ).thenReturn(prepareResponse());
+        ).thenReturn(prepareResponse("__files/hello_oxford.json"));
 
         var definitions = oxfordApiService.getDefinitions(WORD);
 
-        assertThat(definitions).containsExactlyInAnyOrderElementsOf(prepareExpectedDefinitions());
+        assertThat(definitions)
+                .containsExactlyInAnyOrderElementsOf(
+                        prepareExpectedDefinitions(
+                                "data/definition_api_service_response/hello_oxford_response.json",
+                                DefinitionDto[].class
+                        )
+                );
+    }
+
+    @Test
+    void anEmptyDefinitionListIsReturnedForAWordWithNoExamples() throws JsonProcessingException {
+        when(oxfordApiClient.getWordDefinitionResponse(
+                null, null, EN_GB.getSourceLang(), WORD, FIELDS, false)
+        ).thenReturn(prepareResponse("data/api_response/apple_oxford.json"));
+
+        var definitions = oxfordApiService.getDefinitions(WORD);
+
+        assertThat(definitions).isEmpty();
     }
 
     @Test
@@ -67,13 +85,8 @@ class OxfordApiServiceTest {
         assertThat(definitions).isEmpty();
     }
 
-    private Response prepareResponse() throws JsonProcessingException {
-        var jsonStr = readResourceAsString("__files/hello_oxford.json");
+    private Response prepareResponse(String resource) throws JsonProcessingException {
+        var jsonStr = readResourceAsString(resource);
         return objectMapper.readValue(jsonStr, Response.class);
-    }
-
-    private List<DefinitionDto> prepareExpectedDefinitions() throws JsonProcessingException {
-        var jsonStr = readResourceAsString("data/definition_api_service_response/hello_oxford_response.json");
-        return Arrays.asList(objectMapper.readValue(jsonStr, DefinitionDto[].class));
     }
 }

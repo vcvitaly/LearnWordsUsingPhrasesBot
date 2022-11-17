@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.vcvitaly.learnwordsusingphrases.util.DefinitionPreparationHelper.prepareExpectedDefinitions;
 import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readResourceAsString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -48,7 +49,13 @@ class FreeDictionaryApiServiceTest {
 
         var definitions = freeDictionaryApiService.getDefinitions(WORD);
 
-        assertThat(definitions).containsExactlyInAnyOrderElementsOf(prepareExpectedDefinitions());
+        assertThat(definitions)
+                .containsExactlyInAnyOrderElementsOf(
+                        prepareExpectedDefinitions(
+                                "data/definition_api_service_response/hello_freedictionary_response.json",
+                                DefinitionDto[].class
+                        )
+                );
     }
 
     @Test
@@ -64,10 +71,5 @@ class FreeDictionaryApiServiceTest {
     private List<WordDefinitionResponseItemDto> prepareResponse() throws JsonProcessingException {
         var jsonStr = readResourceAsString("__files/hello_freedictionary.json");
         return Arrays.asList(objectMapper.readValue(jsonStr, WordDefinitionResponseItemDto[].class));
-    }
-
-    private List<DefinitionDto> prepareExpectedDefinitions() throws JsonProcessingException {
-        var jsonStr = readResourceAsString("data/definition_api_service_response/hello_freedictionary_response.json");
-        return Arrays.asList(objectMapper.readValue(jsonStr, DefinitionDto[].class));
     }
 }

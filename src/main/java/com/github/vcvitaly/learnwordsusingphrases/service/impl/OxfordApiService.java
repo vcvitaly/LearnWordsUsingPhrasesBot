@@ -62,10 +62,16 @@ public class OxfordApiService implements DefinitionApiService {
         return wordDefinitionResponse.getResults().stream()
                 .map(ResultsItem::getLexicalEntries)
                 .flatMap(Collection::stream)
-                .filter(lexicalEntriesItem -> !lexicalEntriesItem.getEntries().isEmpty() &&
-                        lexicalEntriesItem.getEntries().get(0).getSenses() != null)
+                .filter(this::hasAtLeastOneEntryWithSenseAndExamples)
                 .map(this::toDefinitionDto)
                 .toList();
+    }
+
+    private boolean hasAtLeastOneEntryWithSenseAndExamples(LexicalEntriesItem lexicalEntriesItem) {
+        return !lexicalEntriesItem.getEntries().isEmpty() &&
+                lexicalEntriesItem.getEntries().get(0).getSenses() != null &&
+                lexicalEntriesItem.getEntries().get(0).getSenses().stream()
+                        .anyMatch(sensesItem -> sensesItem.getExamples() != null);
     }
 
     private DefinitionDto toDefinitionDto(LexicalEntriesItem lexicalEntriesItem) {
