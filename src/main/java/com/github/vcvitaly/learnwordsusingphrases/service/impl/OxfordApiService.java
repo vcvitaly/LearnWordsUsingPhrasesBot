@@ -10,6 +10,7 @@ import com.github.vcvitaly.learnwordsusingphrases.dto.oxford.ResultsItem;
 import com.github.vcvitaly.learnwordsusingphrases.dto.oxford.SensesItem;
 import com.github.vcvitaly.learnwordsusingphrases.exception.DefinitionNotFoundException;
 import com.github.vcvitaly.learnwordsusingphrases.service.DefinitionApiService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
@@ -29,6 +30,7 @@ import static java.util.Collections.emptyList;
 @Slf4j
 @Order(2)
 @Service
+@RequiredArgsConstructor
 public class OxfordApiService implements DefinitionApiService {
 
     static final String[] FIELDS = new String[] {"definitions", "examples"};
@@ -39,11 +41,7 @@ public class OxfordApiService implements DefinitionApiService {
     @Value("${api.oxford.app-key}")
     private String apiKey;
 
-    private OxfordApiClient oxfordApiClient;
-
-    public OxfordApiService(OxfordApiClient oxfordApiClient) {
-        this.oxfordApiClient = oxfordApiClient;
-    }
+    private final OxfordApiClient oxfordApiClient;
 
     @Override
     public List<DefinitionDto> getDefinitions(String word) {

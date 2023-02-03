@@ -7,6 +7,7 @@ import com.github.vcvitaly.learnwordsusingphrases.dto.freedictionary.MeaningsIte
 import com.github.vcvitaly.learnwordsusingphrases.dto.freedictionary.WordDefinitionResponseItemDto;
 import com.github.vcvitaly.learnwordsusingphrases.exception.DefinitionNotFoundException;
 import com.github.vcvitaly.learnwordsusingphrases.service.DefinitionApiService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,10 @@ import static java.util.Collections.emptyList;
 @Slf4j
 @Service
 @Order(1)
+@RequiredArgsConstructor
 public class FreeDictionaryApiService implements DefinitionApiService {
 
-    private FreeDictionaryApiClient client;
-
-    public FreeDictionaryApiService(FreeDictionaryApiClient client) {
-        this.client = client;
-    }
+    private final FreeDictionaryApiClient client;
 
     @Override
     public List<DefinitionDto> getDefinitions(String word) {
