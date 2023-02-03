@@ -1,5 +1,6 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,17 +13,12 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DefinitionFacadeService {
 
-    private List<DefinitionApiService> definitionApiServices;
+    private final List<DefinitionApiService> definitionApiServices;
 
-    private DefinitionFormattingService definitionFormattingService;
-
-    public DefinitionFacadeService(List<DefinitionApiService> definitionApiServices,
-                                   DefinitionFormattingService definitionFormattingService) {
-        this.definitionApiServices = definitionApiServices;
-        this.definitionFormattingService = definitionFormattingService;
-    }
+    private final DefinitionFormattingService definitionFormattingService;
 
     public String getDefinitionsAsString(String word) {
         log.info("Getting definitions for: " + word);

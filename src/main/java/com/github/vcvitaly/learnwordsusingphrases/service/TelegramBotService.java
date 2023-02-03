@@ -1,5 +1,6 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TelegramBotService extends TelegramLongPollingBot {
 
     @Value("${telegram.bot.username}")
@@ -22,15 +24,9 @@ public class TelegramBotService extends TelegramLongPollingBot {
     @Value("${telegram.bot.token}")
     private String token;
 
-    private DefinitionFacadeService definitionFacadeService;
+    private final DefinitionFacadeService definitionFacadeService;
 
-    private TelegramMessageChecker messageChecker;
-
-    public TelegramBotService(DefinitionFacadeService definitionFacadeService,
-                              TelegramMessageChecker messageChecker) {
-        this.definitionFacadeService = definitionFacadeService;
-        this.messageChecker = messageChecker;
-    }
+    private final TelegramMessageChecker messageChecker;
 
     @Override
     public String getBotUsername() {
