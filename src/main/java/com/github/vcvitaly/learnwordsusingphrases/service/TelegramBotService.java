@@ -60,6 +60,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 try {
                     text = definitionFacadeService.getDefinitionsAsString(word);
                 } catch (Exception e) {
+                    log.error("Oops, something went wrong.", e);
                     text = "Oops, something went wrong.";
                 }
                 sendText(message.getChatId(), text);
