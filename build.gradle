@@ -24,6 +24,9 @@ dependencies {
 	implementation 'org.telegram:telegrambots-spring-boot-starter:6.4.0'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 
+	implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
+	implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
+
 	testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
 }
 
