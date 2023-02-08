@@ -1,6 +1,6 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.8'
-	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+	id 'org.springframework.boot' version '3.0.2'
+	id 'io.spring.dependency-management' version '1.1.0'
 	id 'java'
 	id "io.freefair.lombok" version "6.6.1"
 }
@@ -15,11 +15,12 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
+//	implementation 'org.springframework.boot:spring-boot-starter-web'
+//	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	testImplementation ('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: "com.vaadin.external.google", module:"android-json"
 	}
-	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign
-	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:3.1.4'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.1'
 
 	implementation 'org.telegram:telegrambots-spring-boot-starter:6.4.0'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
