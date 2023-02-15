@@ -24,6 +24,9 @@ public class TelegramBotService extends TelegramLongPollingBot {
     @Value("${telegram.bot.token}")
     private String token;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     private final DefinitionFacadeService definitionFacadeService;
 
     private final TelegramMessageChecker messageChecker;
@@ -65,7 +68,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 return;
             }
             if (message.hasText()) {
-                wordDefRequestCounter.increment();
+                incrementCounter(wordDefRequestCounter);
                 String word = message.getText();
                 String text;
                 try {
@@ -87,9 +90,15 @@ public class TelegramBotService extends TelegramLongPollingBot {
         sm.enableMarkdownV2(true);
         try {
             execute(sm);
-            wordDefProcessedRequestCounter.increment();
+            incrementCounter(wordDefProcessedRequestCounter);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void incrementCounter(Counter counter) {
+        if (activeProfile.equals("prod")) {
+            counter.increment();
         }
     }
 }
