@@ -7,6 +7,9 @@ api:
     app-id: ${OXFORD_API_APP_ID}
     app-key: ${OXFORD_API_APP_KEY}
 
+cloudwatch:
+  enabled: false
+
 feign:
   client:
     config:

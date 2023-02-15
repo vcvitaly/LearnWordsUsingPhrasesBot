@@ -1,6 +1,7 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.github.vcvitaly.learnwordsusingphrases.ITTemplate;
 import com.github.vcvitaly.learnwordsusingphrases.client.FreeDictionaryApiClient;
 import com.github.vcvitaly.learnwordsusingphrases.client.OxfordApiClient;
 import org.junit.jupiter.api.AfterEach;
@@ -25,16 +26,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Vitalii Chura
  */
-@ActiveProfiles({"test"})
-@SpringBootTest
-class DefinitionFacadeServiceIntegrationTest {
+class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
 
     private static final String WORD_HELLO = "hello";
     private static final String WORD_LURE = "lure";
     private static final String NON_EXISTING_WORD = "aaaaa";
-
-    @MockBean
-    private TelegramBotInitializer telegramBotInitializer;
 
     @Autowired
     private DefinitionFacadeService definitionFacadeService;

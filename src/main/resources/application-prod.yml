@@ -1,3 +1,9 @@
+cloudwatch:
+  config:
+    namespace: learnWordsUsingPhrases
+    step: PT1M
+  enabled: true
+
 telegram:
   bot:
     username: learn_words_with_phrases_bot
