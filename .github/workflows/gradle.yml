@@ -29,4 +29,4 @@ jobs:
       - name: Test with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: test
+          arguments: test --stacktrace
