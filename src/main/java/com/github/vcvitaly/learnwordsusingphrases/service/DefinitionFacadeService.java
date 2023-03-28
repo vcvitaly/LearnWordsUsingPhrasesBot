@@ -24,7 +24,7 @@ public class DefinitionFacadeService {
         log.info("Getting definitions for: " + word);
         for (DefinitionApiService definitionApiService : definitionApiServices) {
             try {
-                var definitions = definitionApiService.getDefinitions(word);
+                final var definitions = definitionApiService.getDefinitions(word);
                 if (!definitions.isEmpty()) {
                     return definitionFormattingService.getDefinitionsAsString(definitions, word);
                 } else {

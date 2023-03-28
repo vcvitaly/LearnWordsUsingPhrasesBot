@@ -65,7 +65,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         log.debug("Received an update: {}", update);
         if (update.hasMessage()) {
-            var message = update.getMessage();
+            final var message = update.getMessage();
             if (message.hasText()) {
                 log.info("Received a message {} from {}", message.getText(), message.getFrom().getUserName());
             }
@@ -79,7 +79,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 }
             } else if (message.hasText()) {
                 incrementCounter(wordDefRequestCounter);
-                String word = message.getText();
+                final var word = message.getText();
                 String text;
                 try {
                     text = definitionFacadeService.getDefinitionsAsString(word);
@@ -97,7 +97,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
     }
 
     private void sendText(Long chatId, String text) {
-        SendMessage sm = SendMessage.builder()
+        final var sm = SendMessage.builder()
                 .chatId(chatId.toString())
                 .text(messageChecker.replaceIllegalChars(text))
                 .build();
