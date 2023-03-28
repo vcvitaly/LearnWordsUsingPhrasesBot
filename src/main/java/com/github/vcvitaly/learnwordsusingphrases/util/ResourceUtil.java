@@ -1,5 +1,7 @@
 package com.github.vcvitaly.learnwordsusingphrases.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -11,10 +13,8 @@ import java.nio.file.Files;
  *
  * @author Vitalii Chura
  */
-public final class ResourceUtil {
-
-    private ResourceUtil() {
-    }
+@UtilityClass
+public class ResourceUtil {
 
     public static String readResourceAsString(String fileName) {
         try {

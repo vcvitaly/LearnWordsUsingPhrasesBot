@@ -1,0 +1,4 @@
+Available commands are:
+/help  - get help message
+/start - get a welcome message
+/subscribed\_words - get a list of words you subscribed for

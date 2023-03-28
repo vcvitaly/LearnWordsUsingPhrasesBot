@@ -1,5 +1,6 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
+import com.github.vcvitaly.learnwordsusingphrases.enumeration.Command;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,11 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.HELP;
+import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.START;
+import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.SUBSCRIBED_WORDS;
+import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readResourceAsString;
 
 /**
  * TelegramBotService.
@@ -60,14 +66,18 @@ public class TelegramBotService extends TelegramLongPollingBot {
         log.debug("Received an update: {}", update);
         if (update.hasMessage()) {
             var message = update.getMessage();
-            if (message.isCommand()) {
-                if (message.getText().equals("/start")) {
-                    sendText(message.getChatId(), "Please type a word and I'll send you it's definition and " +
-                            "an example of it's usage.");
-                }
-                return;
-            }
             if (message.hasText()) {
+                log.info("Received a message {} from {}", message.getText(), message.getFrom().getUserName());
+            }
+            if (message.isCommand()) {
+                if (message.getText().equals(START.getCommand())) {
+                    sendText(message.getChatId(), START);
+                } else if (message.getText().equals(HELP.getCommand())) {
+                    sendText(message.getChatId(), HELP);
+                } else if (message.getText().equals(SUBSCRIBED_WORDS.getCommand())) {
+                    sendText(message.getChatId(), "Not implemented yet");
+                }
+            } else if (message.hasText()) {
                 incrementCounter(wordDefRequestCounter);
                 String word = message.getText();
                 String text;
@@ -80,6 +90,10 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 sendText(message.getChatId(), text);
             }
         }
+    }
+
+    private void sendText(Long chatId, Command command) {
+        sendText(chatId, readResourceAsString(command.getDescriptionFilePath()));
     }
 
     private void sendText(Long chatId, String text) {
