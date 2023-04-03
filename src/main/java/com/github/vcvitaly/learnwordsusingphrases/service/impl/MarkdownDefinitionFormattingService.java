@@ -22,7 +22,7 @@ public class MarkdownDefinitionFormattingService implements DefinitionFormatting
 
     @Override
     public String getDefinitionsAsString(List<DefinitionDto> definitions, String word) {
-        var definitionSb = new StringBuilder();
+        final var definitionSb = new StringBuilder();
         definitionSb
                 .append("Please find definitions for the word ")
                 .append(getBold(word))
@@ -36,7 +36,7 @@ public class MarkdownDefinitionFormattingService implements DefinitionFormatting
     }
 
     private String getDefinition(DefinitionDto definition, String word) {
-        var definitionSb = new StringBuilder();
+        final var definitionSb = new StringBuilder();
         definitionSb.append(getBold(definition.getPartOfSpeech())).append(NEW_LINE);
         definition.getDefinitionItems().stream()
                 .filter(definitionItem -> Objects.nonNull(definitionItem.getExample()))

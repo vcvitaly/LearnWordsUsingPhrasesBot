@@ -73,9 +73,9 @@ public class OxfordApiService implements DefinitionApiService {
     }
 
     private DefinitionDto toDefinitionDto(LexicalEntriesItem lexicalEntriesItem) {
-        var definitionDto = new DefinitionDto();
+        final var definitionDto = new DefinitionDto();
         definitionDto.setPartOfSpeech(lexicalEntriesItem.getLexicalCategory().getId());
-        var definitionItems = lexicalEntriesItem.getEntries().stream()
+        final var definitionItems = lexicalEntriesItem.getEntries().stream()
                 .map(EntriesItem::getSenses)
                 .flatMap(Collection::stream)
                 .filter(sensesItem -> sensesItem.getExamples() != null)
@@ -87,10 +87,9 @@ public class OxfordApiService implements DefinitionApiService {
     }
 
     private DefinitionItemDto toDefinitionItemDto(SensesItem sensesItem) {
-        DefinitionItemDto definitionItemDto = new DefinitionItemDto(
+        return new DefinitionItemDto(
                 sensesItem.getDefinitions().get(0),
                 sensesItem.getExamples().get(0).getText()
         );
-        return definitionItemDto;
     }
 }

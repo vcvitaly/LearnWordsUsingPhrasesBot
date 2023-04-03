@@ -1,0 +1,8 @@
+Hello! I will try to help you learn new English words!
+Please type a word, and I'll send you its definition and an example of its usage.
+If you want, you can subscribe to a word pressing the "Subscribe" button under the word.
+If you subscribe for a word, you will get a notification with its definition and examples once a day.
+You can subscribe for up to 10 words.
+There is the "Unsubscribe" button as well.
+You can get a list of words you subscribed for by typing /subscribed\_words.
+Please type /help to get a list of available commands.

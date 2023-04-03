@@ -5,7 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * DefinitionDto.
+ * DefinitionDto - a list of such definitions is provided by DefinitionApiService, which implementations query the
+ * appropriate API and convert the result into the above list.
  *
  * @author Vitalii Chura
  */

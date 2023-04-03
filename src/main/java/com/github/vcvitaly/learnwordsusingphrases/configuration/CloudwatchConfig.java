@@ -29,13 +29,10 @@ public class CloudwatchConfig {
     public MeterRegistry cloudWatchMeterRegistry(CloudwatchProperties cloudwatchProperties) {
         CloudWatchConfig cloudWatchConfig = setupCloudWatchConfig(cloudwatchProperties);
 
-        CloudWatchMeterRegistry cloudWatchMeterRegistry =
-                new CloudWatchMeterRegistry(
+        return new CloudWatchMeterRegistry(
                         cloudWatchConfig,
                         Clock.SYSTEM,
                         cloudWatchAsyncClient());
-
-        return cloudWatchMeterRegistry;
     }
 
     @Bean

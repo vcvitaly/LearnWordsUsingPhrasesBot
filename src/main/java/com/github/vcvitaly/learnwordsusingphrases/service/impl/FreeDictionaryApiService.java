@@ -52,9 +52,9 @@ public class FreeDictionaryApiService implements DefinitionApiService {
     }
 
     private DefinitionDto toDefinitionDto(MeaningsItemDto meaningsItemDto) {
-        var definitionDto = new DefinitionDto();
+        final var definitionDto = new DefinitionDto();
         definitionDto.setPartOfSpeech(meaningsItemDto.getPartOfSpeech());
-        var definitionItems = meaningsItemDto.getDefinitions().stream()
+        final var definitionItems = meaningsItemDto.getDefinitions().stream()
                 .map(this::toDefinitionItemDto)
                 .toList();
         definitionDto.setDefinitionItems(definitionItems);
