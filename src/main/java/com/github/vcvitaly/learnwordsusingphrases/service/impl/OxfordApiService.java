@@ -56,7 +56,7 @@ public class OxfordApiService implements DefinitionApiService {
             throw e;
         }
 
-        log.debug("Received a response for word '{}' from oxford api: {}", word, wordDefinitionResponse);
+        LOG.debug("Received a response for word '{}' from oxford api: {}", word, wordDefinitionResponse);
         return wordDefinitionResponse.getResults().stream()
                 .map(ResultsItem::getLexicalEntries)
                 .flatMap(Collection::stream)

@@ -73,7 +73,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        log.debug("Received an update: {}", update);
+        LOG.debug("Received an update: {}", update);
         if (update.hasMessage()) {
             final var message = update.getMessage();
             if (message.isCommand() || message.hasText()) {
@@ -95,7 +95,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
     }
 
     private static void logUpdateReceived(Message message) {
-        log.info("Received a message {} from {}", message.getText(), message.getFrom().getUserName());
+        LOG.info("Received a message [{}] from {}", message.getText(), message.getFrom().getUserName());
     }
 
     private void processRegularCommand(Message message) {
@@ -119,7 +119,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
             isWordDefinition = true;
             isSubscribed = false; // TODO get a isSubscribed from the DefinitionFacadeService
         } catch (Exception e) {
-            log.error("Oops, something went wrong.", e);
+            LOG.error("Oops, something went wrong.", e);
             text = "Oops, something went wrong.";
             isWordDefinition = false;
             isSubscribed = false;
@@ -134,10 +134,10 @@ public class TelegramBotService extends TelegramLongPollingBot {
             EditMessageReplyMarkup editMessageReplyMarkup = null;
             if (callbackQuery.getData().equals(SUBSCRIBE.getData())) {
                 editMessageReplyMarkup = getEditMessageReplyMarkup(message, true);
-                log.debug("sub"); // TODO implement
+                LOG.debug("sub"); // TODO implement
             } else if (callbackQuery.getData().equals(UNSUBSCRIBE.getData())) {
                 editMessageReplyMarkup = getEditMessageReplyMarkup(message, false);
-                log.debug("unsub"); // TODO implement
+                LOG.debug("unsub"); // TODO implement
             }
             try {
                 execute(editMessageReplyMarkup);
