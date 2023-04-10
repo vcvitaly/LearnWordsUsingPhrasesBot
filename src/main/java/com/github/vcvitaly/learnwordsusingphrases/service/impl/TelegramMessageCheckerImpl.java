@@ -25,6 +25,8 @@ public class TelegramMessageCheckerImpl implements TelegramMessageChecker {
                 .replaceAll("\\?", "\\\\?")
                 .replaceAll("!", "\\\\!")
                 .replaceAll("\\+", "\\\\+")
-                .replaceAll("-", "\\\\-");
+                .replaceAll("-", "\\\\-")
+                .replaceAll("_", "\\\\_")
+                .replaceAll("\\*", "\\\\_");
     }
 }

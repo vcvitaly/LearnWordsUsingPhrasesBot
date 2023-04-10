@@ -80,7 +80,11 @@ public class TelegramBotService extends TelegramLongPollingBot {
             if (message.hasText()) {
                 final var definitionRequestText = message.getText();
                 incrementCounter(wordDefRequestCounter);
-                sendNotificationToMonitoringGroup(message.getFrom().getUserName(), definitionRequestText);
+                try {
+                    sendNotificationToMonitoringGroup(message.getFrom().getUserName(), definitionRequestText);
+                } catch (Exception e) {
+                    log.error("Could not send a notification to the monitoring chat");
+                }
                 String replyText;
                 SendMessageDto sendMessageDto;
                 try {
