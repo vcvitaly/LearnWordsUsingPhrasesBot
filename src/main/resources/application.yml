@@ -29,6 +29,6 @@ telegram:
   bot:
     welcome-message: "Please type a word and I'll send you it's definition and an example of it's usage."
   notification:
-    enabled: false
+    enabled: ${TELEGRAM_NOTIFICATION_ENABLED:false}
     chat-id: ${TELEGRAM_NOTIFICATION_CHAT_ID:${telegram.notification.mock-chat-id}}
     mock-chat-id: 0
