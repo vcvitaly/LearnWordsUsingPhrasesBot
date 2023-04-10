@@ -34,6 +34,8 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     private final TelegramMessageChecker messageChecker;
 
+    private final NotificationMessageFormatter notificationMessageFormatter;
+
     private final Counter wordDefRequestCounter;
 
     private final Counter wordDefProcessedRequestCounter;
@@ -43,10 +45,12 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     public TelegramBotService(DefinitionFacadeService definitionFacadeService,
                               TelegramMessageChecker messageChecker,
+                              NotificationMessageFormatter notificationMessageFormatter,
                               MeterRegistry meterRegistry,
                               TelegramNotificationProperties telegramNotificationProperties) {
         this.definitionFacadeService = definitionFacadeService;
         this.messageChecker = messageChecker;
+        this.notificationMessageFormatter = notificationMessageFormatter;
         wordDefRequestCounter = meterRegistry.counter("WordDefinitionRequests");
         wordDefProcessedRequestCounter = meterRegistry.counter("WordDefinitionProcessedRequests");
         this.telegramNotificationProperties = telegramNotificationProperties;
@@ -80,10 +84,15 @@ public class TelegramBotService extends TelegramLongPollingBot {
             if (message.hasText()) {
                 final var definitionRequestText = message.getText();
                 incrementCounter(wordDefRequestCounter);
+                String notificationMessage = null;
                 try {
-                    sendNotificationToMonitoringGroup(message.getFrom().getUserName(), definitionRequestText);
+                    notificationMessage = notificationMessageFormatter.formatMessage(
+                            message.getFrom().getUserName(),
+                            definitionRequestText
+                    );
+                    sendNotificationToMonitoringGroup(notificationMessage);
                 } catch (Exception e) {
-                    log.error("Could not send a notification to the monitoring chat");
+                    log.error("Could not send a notification message [{}] to the monitoring chat", notificationMessage, e);
                 }
                 String replyText;
                 SendMessageDto sendMessageDto;
@@ -128,9 +137,8 @@ public class TelegramBotService extends TelegramLongPollingBot {
         }
     }
 
-    private void sendNotificationToMonitoringGroup(String who, String text) {
+    private void sendNotificationToMonitoringGroup(String message) {
         if (telegramNotificationProperties.getEnabled()) {
-            final var message = String.format("%s sent %s", who, text);
             final var sendMessageDto = SendMessageDto.builder()
                     .aDefinition(false)
                     .message(message)

@@ -1,14 +1,14 @@
 package com.github.vcvitaly.learnwordsusingphrases.service.impl;
 
 import com.github.vcvitaly.learnwordsusingphrases.service.TelegramMessageChecker;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
  * TelegramMessageCheckerImpl.
  *
  * @author Vitalii Chura
  */
-@Service
+@Component
 public class TelegramMessageCheckerImpl implements TelegramMessageChecker {
 
     @Override
@@ -25,8 +25,6 @@ public class TelegramMessageCheckerImpl implements TelegramMessageChecker {
                 .replaceAll("\\?", "\\\\?")
                 .replaceAll("!", "\\\\!")
                 .replaceAll("\\+", "\\\\+")
-                .replaceAll("-", "\\\\-")
-                .replaceAll("_", "\\\\_")
-                .replaceAll("\\*", "\\\\_");
+                .replaceAll("-", "\\\\-");
     }
 }
