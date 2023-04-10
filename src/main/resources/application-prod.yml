@@ -8,3 +8,5 @@ telegram:
   bot:
     username: learn_words_with_phrases_bot
     token: ${TELEGRAM_BOT_TOKEN}
+  notification:
+    enabled: true

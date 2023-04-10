@@ -1,5 +1,7 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
+import com.github.vcvitaly.learnwordsusingphrases.configuration.TelegramNotificationProperties;
+import com.github.vcvitaly.learnwordsusingphrases.dto.SendMessageDto;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +25,10 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private String userName;
     @Value("${telegram.bot.token}")
     private String token;
-
     @Value("${spring.profiles.active}")
     private String activeProfile;
+    @Value("${telegram.bot.welcome-message}")
+    private String welcomeMessage;
 
     private final DefinitionFacadeService definitionFacadeService;
 
@@ -35,14 +38,18 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     private final Counter wordDefProcessedRequestCounter;
 
+    private final TelegramNotificationProperties telegramNotificationProperties;
+
 
     public TelegramBotService(DefinitionFacadeService definitionFacadeService,
                               TelegramMessageChecker messageChecker,
-                              MeterRegistry meterRegistry) {
+                              MeterRegistry meterRegistry,
+                              TelegramNotificationProperties telegramNotificationProperties) {
         this.definitionFacadeService = definitionFacadeService;
         this.messageChecker = messageChecker;
         wordDefRequestCounter = meterRegistry.counter("WordDefinitionRequests");
         wordDefProcessedRequestCounter = meterRegistry.counter("WordDefinitionProcessedRequests");
+        this.telegramNotificationProperties = telegramNotificationProperties;
     }
 
     @Override
@@ -59,38 +66,53 @@ public class TelegramBotService extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         log.debug("Received an update: {}", update);
         if (update.hasMessage()) {
-            var message = update.getMessage();
+            final var message = update.getMessage();
             if (message.isCommand()) {
                 if (message.getText().equals("/start")) {
-                    sendText(message.getChatId(), "Please type a word and I'll send you it's definition and " +
-                            "an example of it's usage.");
+                    final var sendMessageDto = SendMessageDto.builder()
+                            .aDefinition(false)
+                            .message(welcomeMessage)
+                            .build();
+                    sendText(message.getChatId(),  sendMessageDto);
                 }
                 return;
             }
             if (message.hasText()) {
+                final var definitionRequestText = message.getText();
                 incrementCounter(wordDefRequestCounter);
-                String word = message.getText();
-                String text;
+                sendNotificationToMonitoringGroup(message.getFrom().getUserName(), definitionRequestText);
+                String replyText;
+                SendMessageDto sendMessageDto;
                 try {
-                    text = definitionFacadeService.getDefinitionsAsString(word);
+                    replyText = definitionFacadeService.getDefinitionsAsString(definitionRequestText);
+                    sendMessageDto = SendMessageDto.builder()
+                            .aDefinition(true)
+                            .message(replyText)
+                            .build();
                 } catch (Exception e) {
                     log.error("Oops, something went wrong.", e);
-                    text = "Oops, something went wrong.";
+                    replyText = "Oops, something went wrong.";
+                    sendMessageDto = SendMessageDto.builder()
+                            .aDefinition(false)
+                            .message(replyText)
+                            .build();
                 }
-                sendText(message.getChatId(), text);
+                sendText(message.getChatId(),  sendMessageDto);
             }
         }
     }
 
-    private void sendText(Long chatId, String text) {
+    private void sendText(Long chatId, SendMessageDto sendMessageDto) {
         SendMessage sm = SendMessage.builder()
                 .chatId(chatId.toString())
-                .text(messageChecker.replaceIllegalChars(text))
+                .text(messageChecker.replaceIllegalChars(sendMessageDto.getMessage()))
                 .build();
         sm.enableMarkdownV2(true);
         try {
             execute(sm);
-            incrementCounter(wordDefProcessedRequestCounter);
+            if (sendMessageDto.getADefinition()) {
+                incrementCounter(wordDefProcessedRequestCounter);
+            }
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
@@ -99,6 +121,17 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private void incrementCounter(Counter counter) {
         if (activeProfile.equals("prod")) {
             counter.increment();
+        }
+    }
+
+    private void sendNotificationToMonitoringGroup(String who, String text) {
+        if (telegramNotificationProperties.getEnabled()) {
+            final var message = String.format("%s sent %s", who, text);
+            final var sendMessageDto = SendMessageDto.builder()
+                    .aDefinition(false)
+                    .message(message)
+                    .build();
+            sendText(telegramNotificationProperties.getChatId(), sendMessageDto);
         }
     }
 }
