@@ -24,3 +24,11 @@ logging:
 route:
   freedictionaryapi: "https://api.dictionaryapi.dev"
   oxfordapi: "https://od-api.oxforddictionaries.com"
+
+telegram:
+  bot:
+    welcome-message: "Please type a word and I'll send you it's definition and an example of it's usage."
+  notification:
+    enabled: false
+    chat-id: ${TELEGRAM_NOTIFICATION_CHAT_ID:${telegram.notification.mock-chat-id}}
+    mock-chat-id: 0
