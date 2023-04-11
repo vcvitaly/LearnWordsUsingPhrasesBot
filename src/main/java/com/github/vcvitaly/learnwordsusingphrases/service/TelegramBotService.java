@@ -26,6 +26,7 @@ import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.STA
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.SUBSCRIBE;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.SUBSCRIBED_WORDS;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.UNSUBSCRIBE;
+import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.UNSUBSCRIBE_ALL;
 import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readResourceAsString;
 
 /**
@@ -43,8 +44,6 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private String token;
     @Value("${spring.profiles.active}")
     private String activeProfile;
-    @Value("${telegram.bot.welcome-message}")
-    private String welcomeMessage;
 
     private final DefinitionFacadeService definitionFacadeService;
 
@@ -111,6 +110,8 @@ public class TelegramBotService extends TelegramLongPollingBot {
         } else if (message.getText().equals(HELP.getCommand())) {
             sendText(message.getChatId(), HELP);
         } else if (message.getText().equals(SUBSCRIBED_WORDS.getCommand())) {
+            sendText(message.getChatId(), "Not implemented yet");
+        } else if (message.getText().equals(UNSUBSCRIBE_ALL.getCommand())) {
             sendText(message.getChatId(), "Not implemented yet");
         }
     }
