@@ -15,7 +15,9 @@ public enum Command {
     HELP("help", "command_text/help.txt"),
     SUBSCRIBED_WORDS("subscribed_words", null),
     SUBSCRIBE("subscribe", null),
-    UNSUBSCRIBE("unsubscribe", null);
+    UNSUBSCRIBE("unsubscribe", null),
+    UNSUBSCRIBE_ALL("unsubscribe_all", null);
+
 
     private final String data;
     private final String descriptionFilePath;
