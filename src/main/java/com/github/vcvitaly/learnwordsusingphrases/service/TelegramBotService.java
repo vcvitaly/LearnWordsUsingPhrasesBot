@@ -2,6 +2,8 @@ package com.github.vcvitaly.learnwordsusingphrases.service;
 
 import com.github.vcvitaly.learnwordsusingphrases.enumeration.Command;
 import com.github.vcvitaly.learnwordsusingphrases.util.Constants;
+import com.github.vcvitaly.learnwordsusingphrases.configuration.TelegramNotificationProperties;
+import com.github.vcvitaly.learnwordsusingphrases.dto.SendMessageDto;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -39,26 +41,35 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private String userName;
     @Value("${telegram.bot.token}")
     private String token;
-
     @Value("${spring.profiles.active}")
     private String activeProfile;
+    @Value("${telegram.bot.welcome-message}")
+    private String welcomeMessage;
 
     private final DefinitionFacadeService definitionFacadeService;
 
     private final TelegramMessageChecker messageChecker;
 
+    private final NotificationMessageFormatter notificationMessageFormatter;
+
     private final Counter wordDefRequestCounter;
 
     private final Counter wordDefProcessedRequestCounter;
 
+    private final TelegramNotificationProperties telegramNotificationProperties;
+
 
     public TelegramBotService(DefinitionFacadeService definitionFacadeService,
                               TelegramMessageChecker messageChecker,
-                              MeterRegistry meterRegistry) {
+                              NotificationMessageFormatter notificationMessageFormatter,
+                              MeterRegistry meterRegistry,
+                              TelegramNotificationProperties telegramNotificationProperties) {
         this.definitionFacadeService = definitionFacadeService;
         this.messageChecker = messageChecker;
+        this.notificationMessageFormatter = notificationMessageFormatter;
         wordDefRequestCounter = meterRegistry.counter("WordDefinitionRequests");
         wordDefProcessedRequestCounter = meterRegistry.counter("WordDefinitionProcessedRequests");
+        this.telegramNotificationProperties = telegramNotificationProperties;
     }
 
     @Override
@@ -81,17 +92,13 @@ public class TelegramBotService extends TelegramLongPollingBot {
             }
             if (message.isCommand()) {
                 processRegularCommand(message);
-            } else if (isRequestForWordDefinition(message)) {
+            } else if (message.hasText()) { // if is a request for a word definition
                 getAndSendWordDefinition(message);
             }
         } else if (update.hasCallbackQuery()) {
             final var callbackQuery = update.getCallbackQuery();
             processCallbackQuery(callbackQuery);
         }
-    }
-
-    private boolean isRequestForWordDefinition(Message message) {
-        return message.hasText();
     }
 
     private static void logUpdateReceived(Message message) {
@@ -109,22 +116,38 @@ public class TelegramBotService extends TelegramLongPollingBot {
     }
 
     private void getAndSendWordDefinition(Message message) {
+        final var definitionRequestText = message.getText();
         incrementCounter(wordDefRequestCounter);
-        final var word = message.getText();
-        String text;
-        boolean isWordDefinition;
+        String notificationMessage = null;
+        try {
+            notificationMessage = notificationMessageFormatter.formatMessage(
+                    message.getFrom().getUserName(),
+                    definitionRequestText
+            );
+            sendNotificationToMonitoringGroup(notificationMessage);
+        } catch (Exception e) {
+            LOG.error("Could not send a notification message [{}] to the monitoring chat", notificationMessage, e);
+        }
+        String replyText;
+        SendMessageDto sendMessageDto;
         boolean isSubscribed;
         try {
-            text = definitionFacadeService.getDefinitionsAsString(word);
-            isWordDefinition = true;
+            replyText = definitionFacadeService.getDefinitionsAsString(definitionRequestText);
+            sendMessageDto = SendMessageDto.builder()
+                    .aDefinition(true)
+                    .message(replyText)
+                    .build();
             isSubscribed = false; // TODO get a isSubscribed from the DefinitionFacadeService
         } catch (Exception e) {
             LOG.error("Oops, something went wrong.", e);
-            text = "Oops, something went wrong.";
-            isWordDefinition = false;
+            replyText = "Oops, something went wrong.";
+            sendMessageDto = SendMessageDto.builder()
+                    .aDefinition(false)
+                    .message(replyText)
+                    .build();
             isSubscribed = false;
         }
-        sendText(message.getChatId(), text, isWordDefinition, isSubscribed);
+        sendText(message.getChatId(), sendMessageDto, isSubscribed);
     }
 
     private void processCallbackQuery(CallbackQuery callbackQuery) {
@@ -166,26 +189,32 @@ public class TelegramBotService extends TelegramLongPollingBot {
     }
 
     private void sendText(Long chatId, Command command) {
-        sendText(chatId, readResourceAsString(command.getDescriptionFilePath()), false, false);
+        sendText(chatId, readResourceAsString(command.getDescriptionFilePath()));
     }
 
     private void sendText(Long chatId, String text) {
-        sendText(chatId, text, false, false);
+        final var sendMessageDto = SendMessageDto.builder()
+                .aDefinition(false)
+                .message(text)
+                .build();
+        sendText(chatId, sendMessageDto, false);
     }
 
-    private void sendText(Long chatId, String text, boolean isWordDefinition, boolean isSubscribed) {
+    private void sendText(Long chatId, SendMessageDto sendMessageDto, boolean isSubscribed) {
         final var sm = SendMessage.builder()
                 .chatId(chatId.toString())
-                .text(messageChecker.replaceIllegalChars(text))
+                .text(messageChecker.replaceIllegalChars(sendMessageDto.getMessage()))
                 .build();
         sm.enableMarkdownV2(true);
-        if (isWordDefinition) {
+        if (sendMessageDto.isADefinition()) {
             final var inlineKeyboardMarkup = getInlineKeyboardMarkup(isSubscribed);
             sm.setReplyMarkup(inlineKeyboardMarkup);
         }
         try {
             execute(sm);
-            incrementCounter(wordDefProcessedRequestCounter);
+            if (sendMessageDto.isADefinition()) {
+                incrementCounter(wordDefProcessedRequestCounter);
+            }
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
@@ -194,6 +223,16 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private void incrementCounter(Counter counter) {
         if (activeProfile.equals("prod")) {
             counter.increment();
+        }
+    }
+
+    private void sendNotificationToMonitoringGroup(String message) {
+        if (Boolean.TRUE.equals(telegramNotificationProperties.getEnabled())) {
+            final var sendMessageDto = SendMessageDto.builder()
+                    .aDefinition(false)
+                    .message(message)
+                    .build();
+            sendText(telegramNotificationProperties.getChatId(), sendMessageDto, false);
         }
     }
 }

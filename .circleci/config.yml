@@ -34,4 +34,5 @@ workflows:
                                       container=${AWS_RESOURCE_NAME_PREFIX},name=OXFORD_API_APP_ID,value=${OXFORD_API_APP_ID},
                                       container=${AWS_RESOURCE_NAME_PREFIX},name=OXFORD_API_APP_KEY,value=${OXFORD_API_APP_KEY},
                                       container=${AWS_RESOURCE_NAME_PREFIX},name=AWS_ACCESS_KEY_ID,value=${AWS_ACCESS_KEY_ID},
-                                      container=${AWS_RESOURCE_NAME_PREFIX},name=AWS_SECRET_ACCESS_KEY,value=${AWS_SECRET_ACCESS_KEY}"
+                                      container=${AWS_RESOURCE_NAME_PREFIX},name=AWS_SECRET_ACCESS_KEY,value=${AWS_SECRET_ACCESS_KEY},
+                                      container=${AWS_RESOURCE_NAME_PREFIX},name=TELEGRAM_NOTIFICATION_CHAT_ID,value=${TELEGRAM_NOTIFICATION_CHAT_ID}"
