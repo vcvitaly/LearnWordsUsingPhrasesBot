@@ -12,6 +12,6 @@ import lombok.Data;
 @Builder
 public class SendMessageDto {
 
-    private Boolean aDefinition;
+    private boolean aDefinition;
     private String message;
 }

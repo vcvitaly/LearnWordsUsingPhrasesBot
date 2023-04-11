@@ -92,17 +92,13 @@ public class TelegramBotService extends TelegramLongPollingBot {
             }
             if (message.isCommand()) {
                 processRegularCommand(message);
-            } else if (isRequestForWordDefinition(message)) {
+            } else if (message.hasText()) { // if is a request for a word definition
                 getAndSendWordDefinition(message);
             }
         } else if (update.hasCallbackQuery()) {
             final var callbackQuery = update.getCallbackQuery();
             processCallbackQuery(callbackQuery);
         }
-    }
-
-    private boolean isRequestForWordDefinition(Message message) {
-        return message.hasText();
     }
 
     private static void logUpdateReceived(Message message) {
@@ -130,7 +126,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
             );
             sendNotificationToMonitoringGroup(notificationMessage);
         } catch (Exception e) {
-            log.error("Could not send a notification message [{}] to the monitoring chat", notificationMessage, e);
+            LOG.error("Could not send a notification message [{}] to the monitoring chat", notificationMessage, e);
         }
         String replyText;
         SendMessageDto sendMessageDto;
@@ -210,13 +206,13 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 .text(messageChecker.replaceIllegalChars(sendMessageDto.getMessage()))
                 .build();
         sm.enableMarkdownV2(true);
-        if (sendMessageDto.getADefinition()) {
+        if (sendMessageDto.isADefinition()) {
             final var inlineKeyboardMarkup = getInlineKeyboardMarkup(isSubscribed);
             sm.setReplyMarkup(inlineKeyboardMarkup);
         }
         try {
             execute(sm);
-            if (sendMessageDto.getADefinition()) {
+            if (sendMessageDto.isADefinition()) {
                 incrementCounter(wordDefProcessedRequestCounter);
             }
         } catch (TelegramApiException e) {
@@ -231,12 +227,12 @@ public class TelegramBotService extends TelegramLongPollingBot {
     }
 
     private void sendNotificationToMonitoringGroup(String message) {
-        if (telegramNotificationProperties.getEnabled()) {
+        if (Boolean.TRUE.equals(telegramNotificationProperties.getEnabled())) {
             final var sendMessageDto = SendMessageDto.builder()
                     .aDefinition(false)
                     .message(message)
                     .build();
-            sendText(telegramNotificationProperties.getChatId(), sendMessageDto);
+            sendText(telegramNotificationProperties.getChatId(), sendMessageDto, false);
         }
     }
 }
