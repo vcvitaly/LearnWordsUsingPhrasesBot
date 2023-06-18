@@ -138,12 +138,12 @@ public class TelegramBotService extends TelegramLongPollingBot {
     }
 
     private void sendNotificationToMonitoringGroup(String message) {
-        if (telegramNotificationProperties.getEnabled()) {
+        if (telegramNotificationProperties.enabled()) {
             final var sendMessageDto = SendMessageDto.builder()
                     .aDefinition(false)
                     .message(message)
                     .build();
-            sendText(telegramNotificationProperties.getChatId(), sendMessageDto);
+            sendText(telegramNotificationProperties.chatId(), sendMessageDto);
         }
     }
 }

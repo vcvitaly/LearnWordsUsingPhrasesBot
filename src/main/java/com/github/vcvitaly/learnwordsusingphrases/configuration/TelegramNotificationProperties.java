@@ -9,9 +9,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Vitalii Chura
  */
 @ConfigurationProperties("telegram.notification")
-@Data
-public class TelegramNotificationProperties {
-
-    private Boolean enabled;
-    private Long chatId;
-}
+public record TelegramNotificationProperties(Boolean enabled, Long chatId) {}
