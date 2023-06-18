@@ -14,7 +14,4 @@ import java.util.Map;
  */
 @ConfigurationProperties("cloudwatch")
 @ConditionalOnProperty(name = "cloudwatch.enabled", havingValue = "true")
-public class CloudwatchProperties {
-    @Getter
-    private final Map<String, String> config = new HashMap<>();
-}
+public record CloudwatchProperties(Map<String, String> config) {}

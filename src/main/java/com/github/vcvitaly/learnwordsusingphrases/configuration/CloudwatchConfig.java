@@ -45,6 +45,6 @@ public class CloudwatchConfig {
     }
 
     private CloudWatchConfig setupCloudWatchConfig(CloudwatchProperties cloudwatchProperties) {
-        return key -> cloudwatchProperties.getConfig().get(key.replaceFirst("cloudwatch\\.", ""));
+        return key -> cloudwatchProperties.config().get(key.replaceFirst("cloudwatch\\.", ""));
     }
 }
