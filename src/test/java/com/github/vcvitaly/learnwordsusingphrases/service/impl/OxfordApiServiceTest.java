@@ -3,6 +3,7 @@ package com.github.vcvitaly.learnwordsusingphrases.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.vcvitaly.learnwordsusingphrases.client.OxfordApiClient;
+import com.github.vcvitaly.learnwordsusingphrases.configuration.OxfordApiProperties;
 import com.github.vcvitaly.learnwordsusingphrases.dto.DefinitionDto;
 import com.github.vcvitaly.learnwordsusingphrases.dto.oxford.Response;
 import com.github.vcvitaly.learnwordsusingphrases.exception.DefinitionNotFoundException;
@@ -20,6 +21,7 @@ import static com.github.vcvitaly.learnwordsusingphrases.service.impl.OxfordApiS
 import static com.github.vcvitaly.learnwordsusingphrases.util.DefinitionPreparationHelper.prepareExpectedDefinitions;
 import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readResourceAsString;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -42,7 +44,7 @@ class OxfordApiServiceTest {
 
     @BeforeEach
     void setUp() {
-        oxfordApiService = new OxfordApiService(oxfordApiClient);
+        oxfordApiService = new OxfordApiService(new OxfordApiProperties(null, null), oxfordApiClient);
     }
 
     @Test
