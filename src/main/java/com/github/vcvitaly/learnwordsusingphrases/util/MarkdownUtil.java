@@ -1,5 +1,6 @@
 package com.github.vcvitaly.learnwordsusingphrases.util;
 
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -7,12 +8,10 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author Vitalii Chura
  */
-public final class MarkdownUtil {
+@UtilityClass
+public class MarkdownUtil {
 
     private static final int WORD_NOT_FOUND = -1;
-
-    private MarkdownUtil() {
-    }
 
     public static String getBold(String s) {
         return "*" + s + "*";
