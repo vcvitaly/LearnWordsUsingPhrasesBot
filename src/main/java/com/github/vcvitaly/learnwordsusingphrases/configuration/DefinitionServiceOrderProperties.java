@@ -2,6 +2,7 @@ package com.github.vcvitaly.learnwordsusingphrases.configuration;
 
 import com.github.vcvitaly.learnwordsusingphrases.enumeration.DefinitionApiServiceType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.convert.Delimiter;
 
 import java.util.List;
 
@@ -11,4 +12,4 @@ import java.util.List;
  * @author Vitalii Chura
  */
 @ConfigurationProperties("app.service-order")
-public record DefinitionServiceOrderProperties(List<DefinitionApiServiceType> services) {}
+public record DefinitionServiceOrderProperties(@Delimiter(";") List<DefinitionApiServiceType> services) {}
