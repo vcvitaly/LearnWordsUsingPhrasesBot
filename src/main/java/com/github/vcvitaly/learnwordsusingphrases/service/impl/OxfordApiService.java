@@ -13,8 +13,6 @@ import com.github.vcvitaly.learnwordsusingphrases.exception.DefinitionNotFoundEx
 import com.github.vcvitaly.learnwordsusingphrases.service.DefinitionApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -29,7 +27,6 @@ import static java.util.Collections.emptyList;
  * @author Vitalii Chura
  */
 @Slf4j
-@Order(2)
 @Service
 @RequiredArgsConstructor
 public class OxfordApiService implements DefinitionApiService {
@@ -85,10 +82,9 @@ public class OxfordApiService implements DefinitionApiService {
     }
 
     private DefinitionItemDto toDefinitionItemDto(SensesItem sensesItem) {
-        DefinitionItemDto definitionItemDto = new DefinitionItemDto(
+        return new DefinitionItemDto(
                 sensesItem.getDefinitions().get(0),
                 sensesItem.getExamples().get(0).getText()
         );
-        return definitionItemDto;
     }
 }
