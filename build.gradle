@@ -20,6 +20,7 @@ dependencies {
 	}
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:3.1.4'
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	implementation 'org.telegram:telegrambots-spring-boot-starter:6.4.0'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'

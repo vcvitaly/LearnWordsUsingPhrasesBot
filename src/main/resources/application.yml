@@ -32,3 +32,8 @@ telegram:
     enabled: ${TELEGRAM_NOTIFICATION_ENABLED:false}
     chat-id: ${TELEGRAM_NOTIFICATION_CHAT_ID:${telegram.notification.mock-chat-id}}
     mock-chat-id: 0
+
+app:
+  service-order:
+    services: ${API_SERVICE_ORDER:${app.service-order.default-order}}
+    default-order: FREE_DICTIONARY,OXFORD
