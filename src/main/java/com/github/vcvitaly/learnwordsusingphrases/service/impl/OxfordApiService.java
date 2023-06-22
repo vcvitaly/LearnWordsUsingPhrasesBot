@@ -1,6 +1,7 @@
 package com.github.vcvitaly.learnwordsusingphrases.service.impl;
 
 import com.github.vcvitaly.learnwordsusingphrases.client.OxfordApiClient;
+import com.github.vcvitaly.learnwordsusingphrases.configuration.OxfordApiProperties;
 import com.github.vcvitaly.learnwordsusingphrases.dto.DefinitionDto;
 import com.github.vcvitaly.learnwordsusingphrases.dto.DefinitionItemDto;
 import com.github.vcvitaly.learnwordsusingphrases.dto.oxford.EntriesItem;
@@ -12,8 +13,6 @@ import com.github.vcvitaly.learnwordsusingphrases.exception.DefinitionNotFoundEx
 import com.github.vcvitaly.learnwordsusingphrases.service.DefinitionApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -28,18 +27,13 @@ import static java.util.Collections.emptyList;
  * @author Vitalii Chura
  */
 @Slf4j
-@Order(2)
 @Service
 @RequiredArgsConstructor
 public class OxfordApiService implements DefinitionApiService {
 
     static final String[] FIELDS = new String[] {"definitions", "examples"};
 
-    @Value("${api.oxford.app-id}")
-    private String apiId;
-
-    @Value("${api.oxford.app-key}")
-    private String apiKey;
+    private final OxfordApiProperties oxfordApiProperties;
 
     private final OxfordApiClient oxfordApiClient;
 
@@ -48,7 +42,8 @@ public class OxfordApiService implements DefinitionApiService {
         Response wordDefinitionResponse;
         try {
              wordDefinitionResponse = oxfordApiClient.getWordDefinitionResponse(
-                    apiId, apiKey, EN_GB.getSourceLang(), word, FIELDS, false);
+                    oxfordApiProperties.appId(), oxfordApiProperties.appKey(), EN_GB.getSourceLang(), word, FIELDS, false
+             );
         } catch (Exception e) {
             if (e.getCause() instanceof DefinitionNotFoundException) {
                 return emptyList();

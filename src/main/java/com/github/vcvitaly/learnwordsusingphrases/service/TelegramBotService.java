@@ -228,12 +228,12 @@ public class TelegramBotService extends TelegramLongPollingBot {
     }
 
     private void sendNotificationToMonitoringGroup(String message) {
-        if (Boolean.TRUE.equals(telegramNotificationProperties.getEnabled())) {
+        if (telegramNotificationProperties.enabled()) {
             final var sendMessageDto = SendMessageDto.builder()
                     .aDefinition(false)
                     .message(message)
                     .build();
-            sendText(telegramNotificationProperties.getChatId(), sendMessageDto, false);
+            sendText(telegramNotificationProperties.chatId(), sendMessageDto, false);
         }
     }
 }

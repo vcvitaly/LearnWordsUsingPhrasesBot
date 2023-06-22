@@ -9,7 +9,6 @@ import com.github.vcvitaly.learnwordsusingphrases.exception.DefinitionNotFoundEx
 import com.github.vcvitaly.learnwordsusingphrases.service.DefinitionApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +23,6 @@ import static java.util.Collections.emptyList;
  */
 @Slf4j
 @Service
-@Order(1)
 @RequiredArgsConstructor
 public class FreeDictionaryApiService implements DefinitionApiService {
 
