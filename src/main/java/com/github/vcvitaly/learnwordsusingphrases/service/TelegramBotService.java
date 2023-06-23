@@ -1,6 +1,7 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
 import com.github.vcvitaly.learnwordsusingphrases.configuration.TelegramNotificationProperties;
+import com.github.vcvitaly.learnwordsusingphrases.dto.MessageFromDetails;
 import com.github.vcvitaly.learnwordsusingphrases.dto.SendMessageDto;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -87,7 +88,11 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 String notificationMessage = null;
                 try {
                     notificationMessage = notificationMessageFormatter.formatMessage(
-                            message.getFrom().getUserName(),
+                            MessageFromDetails.builder()
+                                    .username(message.getFrom().getUserName())
+                                    .firstName(message.getFrom().getFirstName())
+                                    .lastName(message.getFrom().getLastName())
+                                    .build(),
                             definitionRequestText
                     );
                     sendNotificationToMonitoringGroup(notificationMessage);
@@ -118,12 +123,12 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private void sendText(Long chatId, SendMessageDto sendMessageDto) {
         SendMessage sm = SendMessage.builder()
                 .chatId(chatId.toString())
-                .text(messageChecker.replaceIllegalChars(sendMessageDto.getMessage()))
+                .text(messageChecker.replaceIllegalChars(sendMessageDto.message()))
                 .build();
         sm.enableMarkdownV2(true);
         try {
             execute(sm);
-            if (sendMessageDto.getADefinition()) {
+            if (sendMessageDto.aDefinition()) {
                 incrementCounter(wordDefProcessedRequestCounter);
             }
         } catch (TelegramApiException e) {
