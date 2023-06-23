@@ -1,5 +1,7 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
+import com.github.vcvitaly.learnwordsusingphrases.dto.MessageFromDetails;
+
 /**
  * NotificationMessageFormatter.
  *
@@ -7,5 +9,5 @@ package com.github.vcvitaly.learnwordsusingphrases.service;
  */
 public interface NotificationMessageFormatter {
 
-    String formatMessage(String who, String text);
+    String formatMessage(MessageFromDetails fromDetails, String text);
 }
