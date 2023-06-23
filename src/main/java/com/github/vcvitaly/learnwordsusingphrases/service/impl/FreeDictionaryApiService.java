@@ -40,7 +40,7 @@ public class FreeDictionaryApiService implements DefinitionApiService {
             throw e;
         }
 
-        log.debug("Received a response for word '{}' from FreeDictionary API: {}", word, wordDefinitionResponses);
+        LOG.debug("Received a response for word '{}' from FreeDictionary API: {}", word, wordDefinitionResponses);
         return wordDefinitionResponses.get(0).getMeanings().stream()
                 .filter(item -> item.getDefinitions().stream()
                         .anyMatch(definitionItem -> Objects.nonNull(definitionItem.getExample()))
