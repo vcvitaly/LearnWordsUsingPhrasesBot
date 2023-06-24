@@ -8,10 +8,5 @@ import lombok.Data;
  *
  * @author Vitalii Chura
  */
-@Data
 @Builder
-public class SendMessageDto {
-
-    private boolean aDefinition;
-    private String message;
-}
+public record SendMessageDto(Boolean aDefinition, String message) {}

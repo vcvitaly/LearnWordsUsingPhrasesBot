@@ -3,6 +3,7 @@ package com.github.vcvitaly.learnwordsusingphrases.service;
 import com.github.vcvitaly.learnwordsusingphrases.enumeration.Command;
 import com.github.vcvitaly.learnwordsusingphrases.util.Constants;
 import com.github.vcvitaly.learnwordsusingphrases.configuration.TelegramNotificationProperties;
+import com.github.vcvitaly.learnwordsusingphrases.dto.MessageFromDetails;
 import com.github.vcvitaly.learnwordsusingphrases.dto.SendMessageDto;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -122,7 +123,11 @@ public class TelegramBotService extends TelegramLongPollingBot {
         String notificationMessage = null;
         try {
             notificationMessage = notificationMessageFormatter.formatMessage(
-                    message.getFrom().getUserName(),
+                    MessageFromDetails.builder()
+                            .username(message.getFrom().getUserName())
+                            .firstName(message.getFrom().getFirstName())
+                            .lastName(message.getFrom().getLastName())
+                            .build(),
                     definitionRequestText
             );
             sendNotificationToMonitoringGroup(notificationMessage);
@@ -204,16 +209,16 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private void sendText(Long chatId, SendMessageDto sendMessageDto, boolean isSubscribed) {
         final var sm = SendMessage.builder()
                 .chatId(chatId.toString())
-                .text(messageChecker.replaceIllegalChars(sendMessageDto.getMessage()))
+                .text(messageChecker.replaceIllegalChars(sendMessageDto.message()))
                 .build();
         sm.enableMarkdownV2(true);
-        if (sendMessageDto.isADefinition()) {
+        if (sendMessageDto.aDefinition()) {
             final var inlineKeyboardMarkup = getInlineKeyboardMarkup(isSubscribed);
             sm.setReplyMarkup(inlineKeyboardMarkup);
         }
         try {
             execute(sm);
-            if (sendMessageDto.isADefinition()) {
+            if (sendMessageDto.aDefinition()) {
                 incrementCounter(wordDefProcessedRequestCounter);
             }
         } catch (TelegramApiException e) {
