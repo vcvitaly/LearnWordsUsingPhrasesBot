@@ -69,7 +69,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        log.debug("Received an update: {}", update);
+        LOG.debug("Received an update: {}", update);
         if (update.hasMessage()) {
             final var message = update.getMessage();
             if (message.isCommand()) {
@@ -97,7 +97,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
                     );
                     sendNotificationToMonitoringGroup(notificationMessage);
                 } catch (Exception e) {
-                    log.error("Could not send a notification message [{}] to the monitoring chat", notificationMessage, e);
+                    LOG.error("Could not send a notification message [{}] to the monitoring chat", notificationMessage, e);
                 }
                 String replyText;
                 SendMessageDto sendMessageDto;
@@ -108,7 +108,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
                             .message(replyText)
                             .build();
                 } catch (Exception e) {
-                    log.error("Oops, something went wrong.", e);
+                    LOG.error("Oops, something went wrong.", e);
                     replyText = "Oops, something went wrong.";
                     sendMessageDto = SendMessageDto.builder()
                             .aDefinition(false)

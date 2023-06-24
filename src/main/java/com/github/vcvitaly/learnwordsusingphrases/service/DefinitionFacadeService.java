@@ -19,21 +19,21 @@ public class DefinitionFacadeService {
     private final DefinitionFormattingService definitionFormattingService;
 
     public String getDefinitionsAsString(String word) {
-        log.info("Getting definitions for: " + word);
+        LOG.info("Getting definitions for: " + word);
         for (DefinitionApiService definitionApiService : definitionApiServices) {
             try {
                 var definitions = definitionApiService.getDefinitions(word);
                 if (!definitions.isEmpty()) {
                     return definitionFormattingService.getDefinitionsAsString(definitions, word);
                 } else {
-                    log.info("Definitions not found for word '{}' from {}", word, definitionApiService);
+                    LOG.info("Definitions not found for word '{}' from {}", word, definitionApiService);
                 }
             } catch (Exception e) {
-                log.error("An error happened while fetching definitions via {}", definitionApiService.getClass().getSimpleName(), e);
+                LOG.error("An error happened while fetching definitions via {}", definitionApiService.getClass().getSimpleName(), e);
             }
         }
 
-        log.info("Definitions not found for: {}", word);
+        LOG.info("Definitions not found for: {}", word);
         return "Definitions not found for: " + word;
     }
 }
