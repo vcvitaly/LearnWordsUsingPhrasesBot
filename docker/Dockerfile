@@ -1,7 +1,7 @@
 FROM amazoncorretto:17 as build
 WORKDIR /app
 
-COPY ../build.gradle ../settings.gradle ../gradlew ../lombok.config ./
+COPY ../build.gradle ../settings.gradle ../gradle.properties ../gradlew ../lombok.config ./
 COPY ../gradle ./gradle
 RUN ./gradlew --no-daemon downloadDependencies
 COPY src src
