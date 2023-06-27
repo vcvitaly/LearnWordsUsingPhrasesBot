@@ -35,3 +35,7 @@ app:
   service-order:
     services: ${API_SERVICE_ORDER:${app.service-order.default-order}}
     default-order: FREE_DICTIONARY;OXFORD
+
+cache:
+  caffeine:
+    ttl: PT24H

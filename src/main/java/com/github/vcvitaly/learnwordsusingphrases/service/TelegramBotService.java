@@ -221,6 +221,11 @@ public class TelegramBotService extends TelegramLongPollingBot {
             if (sendMessageDto.aDefinition()) {
                 incrementCounter(wordDefProcessedRequestCounter);
             }
+            LOG.info(
+                    "Replied with {} to {}",
+                    sendMessageDto.aDefinition() ? "definition" : sendMessageDto.message(),
+                    chatId
+            );
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
