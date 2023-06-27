@@ -1,8 +1,10 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
+import com.github.vcvitaly.learnwordsusingphrases.configuration.CacheConfig;
 import com.github.vcvitaly.learnwordsusingphrases.configuration.DefinitionServiceList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,11 +20,12 @@ public class DefinitionFacadeService {
     private final DefinitionServiceList definitionApiServices;
     private final DefinitionFormattingService definitionFormattingService;
 
+    @Cacheable(CacheConfig.DEFINITION_CACHE)
     public String getDefinitionsAsString(String word) {
         LOG.info("Getting definitions for: " + word);
         for (DefinitionApiService definitionApiService : definitionApiServices) {
             try {
-                var definitions = definitionApiService.getDefinitions(word);
+                final var definitions = definitionApiService.getDefinitions(word);
                 if (!definitions.isEmpty()) {
                     return definitionFormattingService.getDefinitionsAsString(definitions, word);
                 } else {

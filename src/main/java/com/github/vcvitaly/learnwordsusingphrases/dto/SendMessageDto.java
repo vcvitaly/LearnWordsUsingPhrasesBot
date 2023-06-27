@@ -9,4 +9,4 @@ import lombok.Data;
  * @author Vitalii Chura
  */
 @Builder
-public record SendMessageDto(Boolean aDefinition, String message) {}
+public record SendMessageDto(boolean aDefinition, String message) {}
