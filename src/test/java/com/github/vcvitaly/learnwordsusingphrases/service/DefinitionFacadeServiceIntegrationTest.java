@@ -4,17 +4,23 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.vcvitaly.learnwordsusingphrases.ITTemplate;
 import com.github.vcvitaly.learnwordsusingphrases.client.FreeDictionaryApiClient;
 import com.github.vcvitaly.learnwordsusingphrases.client.OxfordApiClient;
+import com.github.vcvitaly.learnwordsusingphrases.configuration.CacheConfig;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.telegram.telegrambots.starter.TelegramBotInitializer;
+
+import java.util.Objects;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -35,6 +41,9 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
     @Autowired
     private DefinitionFacadeService definitionFacadeService;
 
+    @Autowired
+    private CacheManager cacheManager;
+
     @RegisterExtension
     static WireMockExtension wireMockServer = WireMockExtension.newInstance()
             .options(wireMockConfig().dynamicPort())
@@ -44,6 +53,11 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("route.freedictionaryapi", wireMockServer::baseUrl);
         registry.add("route.oxfordapi", wireMockServer::baseUrl);
+    }
+
+    @BeforeEach
+    void setUp() {
+        clearCache();
     }
 
     @AfterEach
@@ -101,6 +115,7 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
 
     @Test
     void wordDefinitionsAreReturnedFromOxfordApi() {
+        clearCache();
         wireMockServer.stubFor(
                 get(OxfordApiClient.ENDPOINT + "/entries/en-gb/" + WORD_HELLO + "?fields=definitions%2Cexamples&strictMatch=false")
                         .willReturn(
@@ -150,5 +165,12 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
                  """;
         var definitionsAsString = definitionFacadeService.getDefinitionsAsString(WORD_LURE);
         assertThat(definitionsAsString).isEqualTo(expectedString);
+    }
+
+    private void clearCache() {
+        final var cache = cacheManager.getCache(CacheConfig.DEFINITION_CACHE);
+        if (Objects.nonNull(cache)) {
+            cache.clear();
+        }
     }
 }
