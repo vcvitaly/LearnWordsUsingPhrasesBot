@@ -1,4 +1,5 @@
 Available commands are:
-/help  - get help message
+/help - get a help message
 /start - get a welcome message
-/subscribed\_words - get a list of words you subscribed for
+/my\_words - list my words
+/clear\_my\_words - delete all words from my list

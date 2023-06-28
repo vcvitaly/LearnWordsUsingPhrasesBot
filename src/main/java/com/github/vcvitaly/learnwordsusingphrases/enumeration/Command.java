@@ -17,7 +17,7 @@ public enum Command {
     MY_WORDS("my_words", null, "list my words"),
     SAVE_WORD("save_word", null, Constants.SAVE_WORD_TEXT),
     DELETE_WORD("delete_word", null, Constants.DELETE_WORD_TEXT),
-    DELETE_ALL("delete_all", null, "Delete all words from my list");
+    CLEAR_MY_WORDS("clear_my_words", null, "delete all words from my list");
 
 
     private final String data;

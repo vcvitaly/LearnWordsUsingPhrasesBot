@@ -23,7 +23,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Collections;
 
-import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.DELETE_ALL;
+import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.CLEAR_MY_WORDS;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.DELETE_WORD;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.HELP;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.MY_WORDS;
@@ -113,7 +113,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
             sendText(message.getChatId(), HELP);
         } else if (message.getText().equals(MY_WORDS.getCommand())) {
             sendText(message.getChatId(), "Not implemented yet");
-        } else if (message.getText().equals(DELETE_ALL.getCommand())) {
+        } else if (message.getText().equals(CLEAR_MY_WORDS.getCommand())) {
             sendText(message.getChatId(), "Not implemented yet");
         }
     }
