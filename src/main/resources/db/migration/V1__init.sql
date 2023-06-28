@@ -25,10 +25,10 @@ ALTER SEQUENCE public.words_pkey_seq
 
 CREATE TABLE public.words
 (
-    id          bigint      NOT NULL DEFAULT nextval('words_pkey_seq'),
-    word        varchar(30) NOT NULL,
-    created_at  timestamp   NOT NULL,
-    img_s3_path varchar(255),
+    id         bigint      NOT NULL DEFAULT nextval('words_pkey_seq'),
+    word       varchar(30) NOT NULL,
+    created_at timestamp   NOT NULL,
+    img_path   varchar(255),
     PRIMARY KEY (id)
 );
 
