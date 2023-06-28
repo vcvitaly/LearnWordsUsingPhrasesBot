@@ -1,6 +1,13 @@
 spring:
   profiles:
     active: local
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://${TELEBOT_RDS_HOST:localhost}:${TELEBOT_DB_PORT:5432}/${TELEBOT_DB_NAME:learn_words_db}?currentSchema=${TELEBOT_DB_SCHEMA:public}
+    username: ${TELEBOT_DB_USER:postgres}
+    password: ${TELEBOT_DB_PASSWD:postgres}
 
 api:
   oxford:

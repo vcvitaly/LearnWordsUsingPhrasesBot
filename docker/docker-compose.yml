@@ -1,0 +1,16 @@
+version: '3.3'
+
+services:
+  postgres-15-alpine:
+    container_name: postgres-15-alpine
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'dbdata_postgres:/var/lib/postgresql/data'
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=learn_words_db
+    image: 'postgres:15-alpine'
+
+volumes:
+  dbdata_postgres:
