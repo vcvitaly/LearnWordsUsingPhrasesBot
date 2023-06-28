@@ -11,6 +11,6 @@ import lombok.experimental.UtilityClass;
 public class Constants {
 
     public static final String NEW_LINE = "\n";
-    public static final String SUBSCRIBE_TEXT = "Subscribe";
-    public static final String UNSUBSCRIBE_TEXT = "Unsubscribe";
+    public static final String SAVE_WORD_TEXT = "Save this word to my list";
+    public static final String DELETE_WORD_TEXT = "Delete this word from my list";
 }

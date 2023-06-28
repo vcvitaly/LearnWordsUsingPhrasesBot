@@ -1,10 +1,11 @@
 package com.github.vcvitaly.learnwordsusingphrases.service;
 
-import com.github.vcvitaly.learnwordsusingphrases.enumeration.Command;
-import com.github.vcvitaly.learnwordsusingphrases.util.Constants;
+import com.github.vcvitaly.learnwordsusingphrases.configuration.TelegramBotProperties;
 import com.github.vcvitaly.learnwordsusingphrases.configuration.TelegramNotificationProperties;
 import com.github.vcvitaly.learnwordsusingphrases.dto.MessageFromDetails;
 import com.github.vcvitaly.learnwordsusingphrases.dto.SendMessageDto;
+import com.github.vcvitaly.learnwordsusingphrases.enumeration.Command;
+import com.github.vcvitaly.learnwordsusingphrases.util.Constants;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +23,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Collections;
 
+import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.DELETE_ALL;
+import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.DELETE_WORD;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.HELP;
+import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.MY_WORDS;
+import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.SAVE_WORD;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.START;
-import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.SUBSCRIBE;
-import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.SUBSCRIBED_WORDS;
-import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.UNSUBSCRIBE;
-import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.UNSUBSCRIBE_ALL;
 import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readResourceAsString;
 
 /**
@@ -39,12 +40,10 @@ import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readR
 @Service
 public class TelegramBotService extends TelegramLongPollingBot {
 
-    @Value("${telegram.bot.username}")
-    private String userName;
-    @Value("${telegram.bot.token}")
-    private String token;
     @Value("${spring.profiles.active}")
     private String activeProfile;
+
+    private final TelegramBotProperties telegramBotProperties;
 
     private final DefinitionFacadeService definitionFacadeService;
 
@@ -59,11 +58,13 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private final TelegramNotificationProperties telegramNotificationProperties;
 
 
-    public TelegramBotService(DefinitionFacadeService definitionFacadeService,
+    public TelegramBotService(TelegramBotProperties telegramBotProperties,
+                              DefinitionFacadeService definitionFacadeService,
                               TelegramMessageChecker messageChecker,
                               NotificationMessageFormatter notificationMessageFormatter,
                               MeterRegistry meterRegistry,
                               TelegramNotificationProperties telegramNotificationProperties) {
+        this.telegramBotProperties = telegramBotProperties;
         this.definitionFacadeService = definitionFacadeService;
         this.messageChecker = messageChecker;
         this.notificationMessageFormatter = notificationMessageFormatter;
@@ -74,12 +75,12 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return userName;
+        return telegramBotProperties.username();
     }
 
     @Override
     public String getBotToken() {
-        return token;
+        return telegramBotProperties.token();
     }
 
     @Override
@@ -110,9 +111,9 @@ public class TelegramBotService extends TelegramLongPollingBot {
             sendText(message.getChatId(), START);
         } else if (message.getText().equals(HELP.getCommand())) {
             sendText(message.getChatId(), HELP);
-        } else if (message.getText().equals(SUBSCRIBED_WORDS.getCommand())) {
+        } else if (message.getText().equals(MY_WORDS.getCommand())) {
             sendText(message.getChatId(), "Not implemented yet");
-        } else if (message.getText().equals(UNSUBSCRIBE_ALL.getCommand())) {
+        } else if (message.getText().equals(DELETE_ALL.getCommand())) {
             sendText(message.getChatId(), "Not implemented yet");
         }
     }
@@ -161,10 +162,10 @@ public class TelegramBotService extends TelegramLongPollingBot {
         if (message.hasText()) {
             logUpdateReceived(message);
             EditMessageReplyMarkup editMessageReplyMarkup = null;
-            if (callbackQuery.getData().equals(SUBSCRIBE.getData())) {
+            if (callbackQuery.getData().equals(SAVE_WORD.getData())) {
                 editMessageReplyMarkup = getEditMessageReplyMarkup(message, true);
                 LOG.debug("sub"); // TODO implement
-            } else if (callbackQuery.getData().equals(UNSUBSCRIBE.getData())) {
+            } else if (callbackQuery.getData().equals(DELETE_WORD.getData())) {
                 editMessageReplyMarkup = getEditMessageReplyMarkup(message, false);
                 LOG.debug("unsub"); // TODO implement
             }
@@ -176,26 +177,26 @@ public class TelegramBotService extends TelegramLongPollingBot {
         }
     }
 
-    private EditMessageReplyMarkup getEditMessageReplyMarkup(Message message, boolean isSubscribed) {
+    private EditMessageReplyMarkup getEditMessageReplyMarkup(Message message, boolean isSaved) {
         return EditMessageReplyMarkup.builder()
                 .messageId(message.getMessageId())
                 .chatId(message.getChatId())
-                .replyMarkup(getInlineKeyboardMarkup(isSubscribed))
+                .replyMarkup(getInlineKeyboardMarkup(isSaved))
                 .build();
     }
 
-    private InlineKeyboardMarkup getInlineKeyboardMarkup(boolean isSubscribed) {
+    private InlineKeyboardMarkup getInlineKeyboardMarkup(boolean isSaved) {
         final var inlineKeyboardMarkup = new InlineKeyboardMarkup();
         final var inlineKeyboardButton = InlineKeyboardButton.builder()
-                .text(isSubscribed ? Constants.UNSUBSCRIBE_TEXT : Constants.SUBSCRIBE_TEXT)
-                .callbackData(isSubscribed ? UNSUBSCRIBE.getData() : SUBSCRIBE.getData())
+                .text(isSaved ? Constants.DELETE_WORD_TEXT : Constants.SAVE_WORD_TEXT)
+                .callbackData(isSaved ? DELETE_WORD.getData() : SAVE_WORD.getData())
                 .build();
         inlineKeyboardMarkup.setKeyboard(Collections.singletonList(Collections.singletonList(inlineKeyboardButton)));
         return inlineKeyboardMarkup;
     }
 
     private void sendText(Long chatId, Command command) {
-        sendText(chatId, readResourceAsString(command.getDescriptionFilePath()));
+        sendText(chatId, readResourceAsString(command.getDescriptionMessageFilePath()));
     }
 
     private void sendText(Long chatId, String text) {
