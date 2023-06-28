@@ -1,5 +1,4 @@
-version: '3.3'
-
+name: learn_words_infra
 services:
   postgres-15-alpine:
     container_name: postgres-15-alpine
