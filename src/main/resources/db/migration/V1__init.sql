@@ -6,11 +6,11 @@ ALTER SEQUENCE public.users_pkey_seq
 
 CREATE TABLE public.users
 (
-    id         bigint NOT NULL DEFAULT nextval('users_pkey_seq'),
-    chat_id    bigint NOT NULL,
+    id         bigint    NOT NULL DEFAULT nextval('users_pkey_seq'),
+    chat_id    bigint    NOT NULL,
     timezone   integer,
-    created_at date   NOT NULL,
-    updated_at date,
+    created_at timestamp NOT NULL,
+    updated_at timestamp,
     PRIMARY KEY (id)
 );
 
@@ -25,9 +25,9 @@ ALTER SEQUENCE public.words_pkey_seq
 
 CREATE TABLE public.words
 (
-    id          bigint                NOT NULL DEFAULT nextval('words_pkey_seq'),
-    word        character varying(30) NOT NULL,
-    created_at  date                  NOT NULL,
+    id          bigint      NOT NULL DEFAULT nextval('words_pkey_seq'),
+    word        varchar(30) NOT NULL,
+    created_at  timestamp   NOT NULL,
     img_s3_path varchar(255),
     PRIMARY KEY (id)
 );
@@ -44,8 +44,10 @@ ALTER SEQUENCE public.saved_words_pkey_seq
 CREATE TABLE public.saved_words
 (
     id      bigint NOT NULL DEFAULT nextval('saved_words_pkey_seq'),
-    user_id bigint NOT NULL constraint saved_words_to_users_fk references users,
-    word_id bigint NOT NULL constraint saved_words_to_words_fk references words,
+    user_id bigint NOT NULL
+        constraint saved_words_to_users_fk references users,
+    word_id bigint NOT NULL
+        constraint saved_words_to_words_fk references words,
     PRIMARY KEY (id)
 );
 
