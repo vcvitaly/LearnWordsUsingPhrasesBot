@@ -42,7 +42,7 @@ public class User {
     @Column(nullable = false, updatable = false, unique = true)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long chatId;
 
     private Integer timezone;
