@@ -17,7 +17,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
@@ -33,7 +36,8 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "users")
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -56,6 +60,16 @@ public class User {
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinTable(name = "saved_words", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "word_id"))
     private Set<Word> words;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     @Override
     public final boolean equals(Object o) {

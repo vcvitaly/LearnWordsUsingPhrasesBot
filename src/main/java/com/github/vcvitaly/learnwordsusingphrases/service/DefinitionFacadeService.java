@@ -2,6 +2,7 @@ package com.github.vcvitaly.learnwordsusingphrases.service;
 
 import com.github.vcvitaly.learnwordsusingphrases.configuration.CacheConfig;
 import com.github.vcvitaly.learnwordsusingphrases.configuration.DefinitionServiceList;
+import com.github.vcvitaly.learnwordsusingphrases.dto.FormattedDefinitionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,13 +22,18 @@ public class DefinitionFacadeService {
     private final DefinitionFormattingService definitionFormattingService;
 
     @Cacheable(CacheConfig.DEFINITION_CACHE)
-    public String getDefinitionsAsString(String word) {
+    public FormattedDefinitionDto getDefinitions(String word) {
         LOG.info("Getting definitions for: " + word);
         for (DefinitionApiService definitionApiService : definitionApiServices) {
             try {
                 final var definitions = definitionApiService.getDefinitions(word);
                 if (!definitions.isEmpty()) {
-                    return definitionFormattingService.getDefinitionsAsString(definitions, word);
+                    return FormattedDefinitionDto.builder()
+                            .aDefinition(true)
+                            .definitionResult(
+                                    definitionFormattingService.getDefinitionsAsString(definitions, word)
+                            )
+                            .build();
                 } else {
                     LOG.info("Definitions not found for word '{}' from {}", word, definitionApiService);
                 }
@@ -37,6 +43,9 @@ public class DefinitionFacadeService {
         }
 
         LOG.info("Definitions not found for: {}", word);
-        return "Definitions not found for: " + word;
+        return FormattedDefinitionDto.builder()
+                .aDefinition(false)
+                .definitionResult("Definitions not found for: " + word)
+                .build();
     }
 }

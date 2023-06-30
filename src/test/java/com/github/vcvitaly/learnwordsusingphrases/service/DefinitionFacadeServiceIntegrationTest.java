@@ -10,15 +10,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.telegram.telegrambots.starter.TelegramBotInitializer;
 
 import java.util.Objects;
 
@@ -91,8 +86,8 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
                 Definition: An expression of puzzlement or discovery.
                 Example: *Hello*! What’s going on here?
                  """;
-        var definitionsAsString = definitionFacadeService.getDefinitionsAsString(WORD_HELLO);
-        assertThat(definitionsAsString).isEqualTo(expectedString);
+        final var definitions = definitionFacadeService.getDefinitions(WORD_HELLO);
+        assertThat(definitions.definitionResult()).isEqualTo(expectedString);
     }
 
     @Test
@@ -107,9 +102,9 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
                         )
         );
 
-        var expectedString = String.format("Definitions not found for: %s", NON_EXISTING_WORD);
+        final var expectedString = String.format("Definitions not found for: %s", NON_EXISTING_WORD);
 
-        assertThat(definitionFacadeService.getDefinitionsAsString(NON_EXISTING_WORD))
+        assertThat(definitionFacadeService.getDefinitions(NON_EXISTING_WORD).definitionResult())
                 .isEqualTo(expectedString);
     }
 
@@ -126,7 +121,7 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
                         )
         );
 
-        var expectedString = """
+        final var expectedString = """
                 Please find definitions for the word *hello*:
                 *interjection*
                 Definition: used as a greeting or to begin a phone conversation
@@ -138,8 +133,8 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
                 Definition: say or shout ‘hello’
                 Example: I pressed the phone button and *hello*ed
                  """;
-        var definitionsAsString = definitionFacadeService.getDefinitionsAsString(WORD_HELLO);
-        assertThat(definitionsAsString).isEqualTo(expectedString);
+        var definitions = definitionFacadeService.getDefinitions(WORD_HELLO);
+        assertThat(definitions.definitionResult()).isEqualTo(expectedString);
     }
 
     @Test
@@ -154,7 +149,7 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
                         )
         );
 
-        var expectedString = """
+        final var expectedString = """
                 Please find definitions for the word *lure*:
                 *verb*
                 Definition: tempt (a person or animal) to do something or to go somewhere, especially by offering some form of reward
@@ -163,8 +158,8 @@ class DefinitionFacadeServiceIntegrationTest extends ITTemplate {
                 Definition: something that tempts or is used to tempt a person or animal to do something
                 Example: the film industry always has been a glamorous *lure* for young girls
                  """;
-        var definitionsAsString = definitionFacadeService.getDefinitionsAsString(WORD_LURE);
-        assertThat(definitionsAsString).isEqualTo(expectedString);
+        var definitions = definitionFacadeService.getDefinitions(WORD_LURE);
+        assertThat(definitions.definitionResult()).isEqualTo(expectedString);
     }
 
     private void clearCache() {

@@ -42,8 +42,8 @@ class DefinitionFacadeServiceCacheTest extends ITTemplate {
         when(definitionFormattingService.getDefinitionsAsString(definitionDtos, word)).thenReturn("definition");
 
         // Act
-        definitionFacadeService.getDefinitionsAsString(word);
-        definitionFacadeService.getDefinitionsAsString(word);
+        definitionFacadeService.getDefinitions(word);
+        definitionFacadeService.getDefinitions(word);
 
         // Assert
         verify(definitionFormattingService).getDefinitionsAsString(definitionDtos, word);

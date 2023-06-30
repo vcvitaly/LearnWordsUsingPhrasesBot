@@ -21,8 +21,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.Collections;
-
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.CLEAR_MY_WORDS;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.DELETE_WORD;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.HELP;
@@ -30,6 +28,7 @@ import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.MY_
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.SAVE_WORD;
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.Command.START;
 import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readResourceAsString;
+import static java.util.Collections.singletonList;
 
 /**
  * TelegramBotService.
@@ -39,6 +38,10 @@ import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readR
 @Slf4j
 @Service
 public class TelegramBotService extends TelegramLongPollingBot {
+
+    private static final String OOPS_TEXT = "Oops, something went wrong.";
+
+    private static final String CALLBACK_DATA_SEPARATOR = "$";
 
     @Value("${spring.profiles.active}")
     private String activeProfile;
@@ -51,6 +54,8 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     private final NotificationMessageFormatter notificationMessageFormatter;
 
+    private final DaoFacadeService daoFacadeService;
+
     private final Counter wordDefRequestCounter;
 
     private final Counter wordDefProcessedRequestCounter;
@@ -62,12 +67,14 @@ public class TelegramBotService extends TelegramLongPollingBot {
                               DefinitionFacadeService definitionFacadeService,
                               TelegramMessageChecker messageChecker,
                               NotificationMessageFormatter notificationMessageFormatter,
+                              DaoFacadeService daoFacadeService,
                               MeterRegistry meterRegistry,
                               TelegramNotificationProperties telegramNotificationProperties) {
         this.telegramBotProperties = telegramBotProperties;
         this.definitionFacadeService = definitionFacadeService;
         this.messageChecker = messageChecker;
         this.notificationMessageFormatter = notificationMessageFormatter;
+        this.daoFacadeService = daoFacadeService;
         wordDefRequestCounter = meterRegistry.counter("WordDefinitionRequests");
         wordDefProcessedRequestCounter = meterRegistry.counter("WordDefinitionProcessedRequests");
         this.telegramNotificationProperties = telegramNotificationProperties;
@@ -94,7 +101,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
             if (message.isCommand()) {
                 processRegularCommand(message);
             } else if (message.hasText()) { // if is a request for a word definition
-                getAndSendWordDefinition(message);
+                notifyAndGetAndSendWordDefinition(message);
             }
         } else if (update.hasCallbackQuery()) {
             final var callbackQuery = update.getCallbackQuery();
@@ -106,19 +113,43 @@ public class TelegramBotService extends TelegramLongPollingBot {
         LOG.info("Received a message [{}] from {}", message.getText(), message.getFrom().getUserName());
     }
 
+    /**
+     * Processes a regular command, i.e., not a CRUD one (save_word, delete_word).
+     *
+     * @param message TelegramBots message object
+     */
     private void processRegularCommand(Message message) {
+        final var chatId = message.getChatId();
         if (message.getText().equals(START.getCommand())) {
-            sendText(message.getChatId(), START);
+            sendText(chatId, START);
         } else if (message.getText().equals(HELP.getCommand())) {
-            sendText(message.getChatId(), HELP);
+            sendText(chatId, HELP);
         } else if (message.getText().equals(MY_WORDS.getCommand())) {
-            sendText(message.getChatId(), "Not implemented yet");
+            processMyWords(chatId);
         } else if (message.getText().equals(CLEAR_MY_WORDS.getCommand())) {
-            sendText(message.getChatId(), "Not implemented yet");
+            processClearMyWords(chatId);
         }
     }
 
-    private void getAndSendWordDefinition(Message message) {
+    private void processMyWords(Long chatId) {
+        final var userWords = daoFacadeService.getUserWords(chatId);
+        if (userWords.isEmpty()) {
+            sendSimpleText(chatId, "You have no words saved.");
+        } else {
+            final var wordsAsString = String.join(Constants.NEW_LINE, userWords);
+            sendSimpleText(chatId, wordsAsString);
+        }
+    }
+
+    private void processClearMyWords(Long chatId) {
+        if (daoFacadeService.deleteAllUserWords(chatId)) {
+            sendSimpleText(chatId, "All words have been deleted from your list");
+        } else {
+            sendSimpleText(chatId, "You have no words saved.");
+        }
+    }
+
+    private void notifyAndGetAndSendWordDefinition(Message message) {
         final var definitionRequestText = message.getText();
         incrementCounter(wordDefRequestCounter);
         String notificationMessage = null;
@@ -135,26 +166,29 @@ public class TelegramBotService extends TelegramLongPollingBot {
         } catch (Exception e) {
             LOG.error("Could not send a notification message [{}] to the monitoring chat", notificationMessage, e);
         }
-        String replyText;
+        getAndSendWordDefinition(message.getChatId(), definitionRequestText);
+    }
+
+    private void getAndSendWordDefinition(Long chatId, String definitionRequestText) {
         SendMessageDto sendMessageDto;
-        boolean isSubscribed;
+        boolean isSaved;
         try {
-            replyText = definitionFacadeService.getDefinitionsAsString(definitionRequestText);
+            final var formattedDefinitionDto = definitionFacadeService.getDefinitions(definitionRequestText);
             sendMessageDto = SendMessageDto.builder()
-                    .aDefinition(true)
-                    .message(replyText)
+                    .aDefinition(formattedDefinitionDto.aDefinition())
+                    .message(formattedDefinitionDto.definitionResult())
+                    .word(definitionRequestText)
                     .build();
-            isSubscribed = false; // TODO get a isSubscribed from the DefinitionFacadeService
+            isSaved = daoFacadeService.hasWordSaved(chatId, definitionRequestText);
         } catch (Exception e) {
-            LOG.error("Oops, something went wrong.", e);
-            replyText = "Oops, something went wrong.";
+            LOG.error(OOPS_TEXT, e);
             sendMessageDto = SendMessageDto.builder()
                     .aDefinition(false)
-                    .message(replyText)
+                    .message(OOPS_TEXT)
                     .build();
-            isSubscribed = false;
+            isSaved = false;
         }
-        sendText(message.getChatId(), sendMessageDto, isSubscribed);
+        sendText(chatId, sendMessageDto, isSaved);
     }
 
     private void processCallbackQuery(CallbackQuery callbackQuery) {
@@ -162,12 +196,31 @@ public class TelegramBotService extends TelegramLongPollingBot {
         if (message.hasText()) {
             logUpdateReceived(message);
             EditMessageReplyMarkup editMessageReplyMarkup = null;
-            if (callbackQuery.getData().equals(SAVE_WORD.getData())) {
-                editMessageReplyMarkup = getEditMessageReplyMarkup(message, true);
-                LOG.debug("sub"); // TODO implement
-            } else if (callbackQuery.getData().equals(DELETE_WORD.getData())) {
-                editMessageReplyMarkup = getEditMessageReplyMarkup(message, false);
-                LOG.debug("unsub"); // TODO implement
+            final var callbackQueryData = callbackQuery.getData().split("\\" + CALLBACK_DATA_SEPARATOR);
+            if (callbackQueryData.length != 2) {
+                throw new IllegalStateException("Callback query data should have the format data$word");
+            }
+            final var data = callbackQueryData[0];
+            final var word = callbackQueryData[1];
+            final var chatId = message.getChatId();
+            if (data.equals(SAVE_WORD.getData())) {
+                try {
+                    daoFacadeService.saveWordForUser(chatId, word);
+                } catch (Exception e) {
+                    LOG.error("An error while processing the callback query [{}]", callbackQueryData, e);
+                    return;
+                }
+                editMessageReplyMarkup = getEditMessageReplyMarkup(message, true, word);
+            } else if (data.equals(DELETE_WORD.getData())) {
+                try {
+                    if (daoFacadeService.hasWordSaved(chatId, word)) {
+                        daoFacadeService.deleteWordFromUser(chatId, word);
+                    }
+                } catch (Exception e) {
+                    LOG.error("An error while processing the callback query [{}]", callbackQueryData, e);
+                    return;
+                }
+                editMessageReplyMarkup = getEditMessageReplyMarkup(message, false, word);
             }
             try {
                 execute(editMessageReplyMarkup);
@@ -177,44 +230,42 @@ public class TelegramBotService extends TelegramLongPollingBot {
         }
     }
 
-    private EditMessageReplyMarkup getEditMessageReplyMarkup(Message message, boolean isSaved) {
+    private EditMessageReplyMarkup getEditMessageReplyMarkup(Message message, boolean isSaved, String word) {
         return EditMessageReplyMarkup.builder()
                 .messageId(message.getMessageId())
                 .chatId(message.getChatId())
-                .replyMarkup(getInlineKeyboardMarkup(isSaved))
+                .replyMarkup(getInlineKeyboardMarkup(isSaved, word))
                 .build();
     }
 
-    private InlineKeyboardMarkup getInlineKeyboardMarkup(boolean isSaved) {
+    private InlineKeyboardMarkup getInlineKeyboardMarkup(boolean isSaved, String word) {
         final var inlineKeyboardMarkup = new InlineKeyboardMarkup();
         final var inlineKeyboardButton = InlineKeyboardButton.builder()
                 .text(isSaved ? Constants.DELETE_WORD_TEXT : Constants.SAVE_WORD_TEXT)
-                .callbackData(isSaved ? DELETE_WORD.getData() : SAVE_WORD.getData())
+                .callbackData(isSaved ?
+                        getCallbackDataWithSeparator(DELETE_WORD.getData(), word) :
+                        getCallbackDataWithSeparator(SAVE_WORD.getData(), word))
                 .build();
-        inlineKeyboardMarkup.setKeyboard(Collections.singletonList(Collections.singletonList(inlineKeyboardButton)));
+        inlineKeyboardMarkup.setKeyboard(singletonList(singletonList(inlineKeyboardButton)));
         return inlineKeyboardMarkup;
     }
 
+    private String getCallbackDataWithSeparator(String callbackData, String word) {
+        return String.format("%s%s%s", callbackData, CALLBACK_DATA_SEPARATOR, word);
+    }
+
     private void sendText(Long chatId, Command command) {
-        sendText(chatId, readResourceAsString(command.getDescriptionMessageFilePath()));
+        sendSimpleText(chatId, readResourceAsString(command.getDescriptionMessageFilePath()));
     }
 
-    private void sendText(Long chatId, String text) {
-        final var sendMessageDto = SendMessageDto.builder()
-                .aDefinition(false)
-                .message(text)
-                .build();
-        sendText(chatId, sendMessageDto, false);
-    }
-
-    private void sendText(Long chatId, SendMessageDto sendMessageDto, boolean isSubscribed) {
+    private void sendText(Long chatId, SendMessageDto sendMessageDto, boolean isSaved) {
         final var sm = SendMessage.builder()
                 .chatId(chatId.toString())
                 .text(messageChecker.replaceIllegalChars(sendMessageDto.message()))
                 .build();
         sm.enableMarkdownV2(true);
         if (sendMessageDto.aDefinition()) {
-            final var inlineKeyboardMarkup = getInlineKeyboardMarkup(isSubscribed);
+            final var inlineKeyboardMarkup = getInlineKeyboardMarkup(isSaved, sendMessageDto.word());
             sm.setReplyMarkup(inlineKeyboardMarkup);
         }
         try {
@@ -230,6 +281,14 @@ public class TelegramBotService extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void sendSimpleText(Long chatId, String text) {
+        final var sendMessageDto = SendMessageDto.builder()
+                .aDefinition(false)
+                .message(text)
+                .build();
+        sendText(chatId, sendMessageDto, false);
     }
 
     private void incrementCounter(Counter counter) {

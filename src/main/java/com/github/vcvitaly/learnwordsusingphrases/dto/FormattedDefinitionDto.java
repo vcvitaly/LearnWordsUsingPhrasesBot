@@ -1,12 +1,11 @@
 package com.github.vcvitaly.learnwordsusingphrases.dto;
 
 import lombok.Builder;
-import lombok.Data;
 
 /**
- * SendMessageDto.
+ * FormattedDefinitionDto.
  *
  * @author Vitalii Chura
  */
 @Builder
-public record SendMessageDto(boolean aDefinition, String message, String word) {}
+public record FormattedDefinitionDto(boolean aDefinition, String definitionResult) {}

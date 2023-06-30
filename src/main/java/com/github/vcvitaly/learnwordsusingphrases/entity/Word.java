@@ -1,25 +1,23 @@
 package com.github.vcvitaly.learnwordsusingphrases.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Word.
@@ -28,10 +26,12 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "words")
+@Entity
+@Table(name = "words")
 public class Word {
 
     @Id
@@ -48,10 +48,10 @@ public class Word {
 
     private String imgPath;
 
-    @ToString.Exclude
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
-    @JoinTable(name = "saved_words", joinColumns = @JoinColumn(name = "word_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> users;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
     @Override
     public final boolean equals(Object o) {
