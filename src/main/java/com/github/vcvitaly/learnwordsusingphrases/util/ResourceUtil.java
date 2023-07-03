@@ -25,7 +25,7 @@ public class ResourceUtil {
         }
     }
 
-    private static File getFileFromResource(String fileName) throws URISyntaxException {
+    public static File getFileFromResource(String fileName) throws URISyntaxException {
         ClassLoader classLoader = ResourceUtil.class.getClassLoader();
         URL resource = classLoader.getResource(fileName);
         if (resource == null) {
