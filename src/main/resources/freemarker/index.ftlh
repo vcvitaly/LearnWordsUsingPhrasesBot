@@ -13,6 +13,13 @@
       margin-left: auto;
       margin-right: auto;
     }
+    .definition-bg {
+      background: bisque;
+    }
+    .example-bg {
+      background: azure;
+    }
+    /*table definition*/
     table {
       border-collapse: separate;
       border-spacing: 0;
@@ -61,8 +68,8 @@
   <table class="center">
     <tr><th colspan="2">${dto.partOfSpeech}</th></tr>
     <#list dto.definitionItems as item>
-      <tr><td>Definition</td><td>${item.definition}</td></tr>
-      <tr><td>Example</td><td>${item.example}</td></tr>
+      <tr class="definition-bg"><td>Definition</td><td>${item.definition}</td></tr>
+      <tr class="example-bg"><td>Example</td><td>${item.example}</td></tr>
     </#list>
   </table>
     <#sep> <br>
