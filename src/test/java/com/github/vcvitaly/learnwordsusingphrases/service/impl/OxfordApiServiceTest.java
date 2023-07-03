@@ -13,12 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static com.github.vcvitaly.learnwordsusingphrases.enumeration.OxfordApiSourceLang.EN_GB;
 import static com.github.vcvitaly.learnwordsusingphrases.service.impl.OxfordApiService.FIELDS;
-import static com.github.vcvitaly.learnwordsusingphrases.util.DefinitionPreparationHelper.prepareExpectedDefinitions;
+import static com.github.vcvitaly.learnwordsusingphrases.DefinitionPreparationHelper.prepareExpectedDefinitions;
 import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readResourceAsString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

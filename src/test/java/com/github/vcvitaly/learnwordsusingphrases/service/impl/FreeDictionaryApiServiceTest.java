@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.vcvitaly.learnwordsusingphrases.util.DefinitionPreparationHelper.prepareExpectedDefinitions;
+import static com.github.vcvitaly.learnwordsusingphrases.DefinitionPreparationHelper.prepareExpectedDefinitions;
 import static com.github.vcvitaly.learnwordsusingphrases.util.ResourceUtil.readResourceAsString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

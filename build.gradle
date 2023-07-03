@@ -38,6 +38,8 @@ dependencies {
 	implementation 'io.micrometer:micrometer-core'
 	implementation 'io.micrometer:micrometer-registry-cloudwatch2'
 
+	implementation 'org.freemarker:freemarker:2.3.32'
+
 	testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
 }
 
