@@ -110,7 +110,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
     }
 
     private static void logUpdateReceived(Message message) {
-        LOG.info("Received a message [{}] from {}", message.getText(), message.getFrom().getUserName());
+        LOG.info("Received a message '{}' from {}", message.getText(), message.getFrom().getUserName());
     }
 
     /**
@@ -274,7 +274,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 incrementCounter(wordDefProcessedRequestCounter);
             }
             LOG.info(
-                    "Replied with {} to {}",
+                    "Replied with '{}' to {}",
                     sendMessageDto.aDefinition() ? "definition" : sendMessageDto.message(),
                     chatId
             );
