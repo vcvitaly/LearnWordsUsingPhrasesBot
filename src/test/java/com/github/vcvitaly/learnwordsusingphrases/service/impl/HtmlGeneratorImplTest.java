@@ -26,8 +26,8 @@ class HtmlGeneratorImplTest {
         final var s = ResourceUtil.readResourceAsString("data/freemarker/hello_oxford_response.json");
         final var definitionDtos = TestUtil.convertToListOfObjects(s, DefinitionDto.class);
 
-//        System.out.println(htmlGenerator.generateHtml(definitionDtos));
         String html = htmlGenerator.generateHtml(definitionDtos);
+        System.out.println(html);
 
         assertThat(html).isNotEmpty();
     }

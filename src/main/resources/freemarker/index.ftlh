@@ -8,6 +8,7 @@
     body {
       font-family: 'Quicksand', sans-serif;
       margin: 30px;
+      max-width: 400px;
     }
     .center {
       margin-left: auto;
@@ -24,6 +25,7 @@
       border-collapse: separate;
       border-spacing: 0;
       min-width: 350px;
+      max-width: 350px;
     }
     table tr th,
     table tr td {

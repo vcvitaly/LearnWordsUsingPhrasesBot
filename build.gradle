@@ -12,6 +12,12 @@ sourceCompatibility = '17'
 repositories {
 	mavenLocal()
 	mavenCentral()
+//	maven {
+//		url = uri('https://repository.aspose.com/repo/')
+//	}
+	maven {
+		url "https://jitpack.io"
+	}
 }
 
 dependencies {
@@ -39,6 +45,9 @@ dependencies {
 	implementation 'io.micrometer:micrometer-registry-cloudwatch2'
 
 	implementation 'org.freemarker:freemarker:2.3.32'
+//	implementation 'gui.ava:html2image:0.9'
+	implementation 'com.github.hkirk:java-html2image:0.9'
+//	implementation(group: 'com.aspose', name: 'aspose-html', version: '23.5.1', classifier: 'jdk1.8')
 
 	testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
 }
